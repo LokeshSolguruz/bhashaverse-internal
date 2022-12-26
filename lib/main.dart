@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import 'presentation/splash_screen/binding/splash_binding.dart';
@@ -35,6 +36,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: primaryColor,
+        textTheme: GoogleFonts.latoTextTheme(),
+        canvasColor: Colors.white,
       ),
       getPages: AppRoutes.pages,
       initialBinding: SplashBinding(),
