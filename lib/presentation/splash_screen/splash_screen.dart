@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../routes/app_routes.dart';
 import 'controller/splash_controller.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,9 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     _splashController = Get.find();
     super.initState();
-    Future.delayed(const Duration(seconds: 3)).then((value) {
-      Get.offNamed(AppRoutes.homeRoute);
-    });
+    _splashController.calcAvailableSourceAndTargetLanguages();
   }
 
   @override
