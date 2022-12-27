@@ -123,7 +123,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               ? false
               : true,
           child: InkWell(
-            onTap: () => Get.offNamed(AppRoutes.homeRoute),
+            onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
               AppStrings.skip,
               style: AppTextStyle().light16BalticSea.copyWith(
