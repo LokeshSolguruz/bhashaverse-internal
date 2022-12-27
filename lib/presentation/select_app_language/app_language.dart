@@ -34,9 +34,11 @@ class _AppLanguageState extends State<AppLanguage> {
   @override
   void dispose() {
     super.dispose();
+    if (_focusNodeLanguageSearch.hasFocus) {
+      _focusNodeLanguageSearch.unfocus();
+    }
     _focusNodeLanguageSearch.dispose();
     _appLanguageController.dispose();
-    _focusNodeLanguageSearch.dispose();
   }
 
   @override
