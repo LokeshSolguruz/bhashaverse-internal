@@ -77,7 +77,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
                               1)
-                      ? () => Get.offNamed(AppRoutes.homeRoute)
+                      ? () => Get.offNamed(AppRoutes.voiceAssistantRoute)
                       : () {
                           _pageController?.nextPage(
                               duration: const Duration(milliseconds: 400),
@@ -123,7 +123,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               ? false
               : true,
           child: InkWell(
-            onTap: () => Get.offNamed(AppRoutes.homeRoute),
+            onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
               AppStrings.skip,
               style: AppTextStyle().light16BalticSea.copyWith(
