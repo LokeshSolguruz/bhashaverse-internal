@@ -77,7 +77,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
                               1)
-                      ? () => Get.offNamed(AppRoutes.homeRoute)
+                      ? () => Get.offNamed(AppRoutes.voiceAssistantRoute)
                       : () {
                           _pageController?.nextPage(
                               duration: const Duration(milliseconds: 400),
