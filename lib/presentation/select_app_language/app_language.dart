@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../common/elevated_button.dart';
 import '../../common/language_selection_widget.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
@@ -106,6 +107,9 @@ class _AppLanguageState extends State<AppLanguage> {
                     _focusNodeLanguageSearch.unfocus();
                   }
                   _languageSearchController.clear();
+                  Future.delayed(const Duration(milliseconds: 200)).then((_) {
+                    Get.toNamed(AppRoutes.onboardingRoute);
+                  });
                 },
               ),
               SizedBox(height: 16.toHeight),
