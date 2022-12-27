@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../common/elevated_button.dart';
 import '../../enums/gender_enum.dart';
@@ -19,12 +20,18 @@ class VoiceAssistantScreen extends StatefulWidget {
 
 class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   late VoiceAssistantController _voiceAssistantController;
+  Box hiveDBInstance = Hive.box(hiveDBName);
 
   @override
   void initState() {
     super.initState();
-    _voiceAssistantController = Get.put(VoiceAssistantController());
     ScreenUtil().init();
+    _voiceAssistantController = Get.put(VoiceAssistantController());
+    var selectedGender = hiveDBInstance.get(preferredVoiceAssistant);
+    if (selectedGender != null && selectedGender.isNotEmpty) {
+      _voiceAssistantController
+          .setSelectedGender(GenderEnum.values.byName(selectedGender));
+    }
   }
 
   @override
@@ -93,17 +100,20 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
           borderRadius: BorderRadius.circular(8),
           onTap: () {
             _voiceAssistantController.setSelectedGender(gender);
+            hiveDBInstance.put(preferredVoiceAssistant, gender.name);
           },
           child: Container(
             padding: AppEdgeInsets.instance.all(22),
             decoration: BoxDecoration(
-              color: (_voiceAssistantController.getSelectedGender() == gender)
+              color: (_voiceAssistantController.getSelectedGender() != null &&
+                      _voiceAssistantController.getSelectedGender() == gender)
                   ? sassyGreen
                   : Colors.white,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 width: 1.toWidth,
-                color: (_voiceAssistantController.getSelectedGender() == gender)
+                color: (_voiceAssistantController.getSelectedGender() != null &&
+                        _voiceAssistantController.getSelectedGender() == gender)
                     ? japaneseLaurel
                     : americanSilver,
               ),
