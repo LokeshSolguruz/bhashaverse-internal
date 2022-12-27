@@ -66,7 +66,7 @@ class AppStrings {
 }
 
 // App Assets
-const imgSplashLogo = 'assets/images/img_splash_logo.png';
+const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
 
 // Select App Language Screen
 const imgEnglish = 'assets/images/app_language_img/img_english.png';
@@ -79,18 +79,18 @@ const imgKannada = 'assets/images/app_language_img/img_kannada.png';
 
 // Onboarding screen
 const imgOnboarding1 =
-    'assets/images/onboarding_image/img_illustration_onboarding_1.png';
+    'assets/images/onboarding_image/img_illustration_onboarding_1.webp';
 const imgOnboarding2 =
-    'assets/images/onboarding_image/img_illustration_onboarding_2.png';
+    'assets/images/onboarding_image/img_illustration_onboarding_2.webp';
 const imgOnboarding3 =
-    'assets/images/onboarding_image/img_illustration_onboarding_3.png';
+    'assets/images/onboarding_image/img_illustration_onboarding_3.webp';
 const imgOnboarding4 =
-    'assets/images/onboarding_image/img_illustration_onboarding_4.png';
+    'assets/images/onboarding_image/img_illustration_onboarding_4.webp';
 const iconPrevious = 'assets/images/common_icon/icon_arrow_previous.svg';
 
 // Voice Assistant Screen
-const imgMaleAvatar = 'assets/images/img_male_avatar.png';
-const imgFemaleAvatar = 'assets/images/img_female_avatar.png';
+const imgMaleAvatar = 'assets/images/img_male_avatar.webp';
+const imgFemaleAvatar = 'assets/images/img_female_avatar.webp';
 
 // Setting Screen
 const iconArrowDown = 'assets/images/common_icon/icon_arrow_down.svg';
