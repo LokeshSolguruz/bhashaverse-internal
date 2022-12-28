@@ -20,4 +20,10 @@ class AppTextStyle {
     fontSize: 18.toFont,
     color: dolphinGray,
   );
+
+  final regular14Arsenic = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 14.toFont,
+    color: arsenicColor,
+  );
 }
