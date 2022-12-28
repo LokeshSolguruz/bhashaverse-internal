@@ -48,7 +48,6 @@ class AppStrings {
   static const String letsTranslate = 'Let’s translate';
 
   // Settings Screen
-  static const String settings = 'Settings';
   static const String appTheme = 'App Theme';
   static const String appInterfaceWillChange =
       'App interface will change in selected mode accordingly';
@@ -63,6 +62,19 @@ class AppStrings {
   static const String transLiterationWillInitiateWord =
       'Transliteration will initiate word suggestions while you type';
   static const String advanceSettings = 'Advanced Settings';
+
+  // Bottom Bar Items
+  static const String kTranslation = 'Translation';
+  static const String kChat = 'Chat';
+  static const String kSettings = 'Settings';
+
+  //Bottom Nav - Translation
+  static const kTranslateSourceTitle = 'Translate from';
+  static const kTranslateTargetTitle = 'Translate to';
+  static const kTranslationHintText = 'Start typing or press mic to Begin';
+  static const kPaste = 'Paste';
+  static const kTranslate = 'Translate';
+  static const kClearAll = 'Clear All';
 }
 
 // App Assets
@@ -98,3 +110,17 @@ const iconSelectedRadio =
     'assets/images/common_icon/icon_selected_radio_button.svg';
 const iconUnSelectedRadio =
     'assets/images/common_icon/icon_unselected_radio_button.svg';
+
+// Bottom Bar Icons
+const iconTranslation = 'assets/images/bottom_bar_icons/icon_translation.svg';
+const iconChat = 'assets/images/bottom_bar_icons/icon_chat.svg';
+const iconSettings = 'assets/images/bottom_bar_icons/icon_settings.svg';
+
+// Bottom Nav Translation
+const iconArrowSwapHorizontal =
+    'assets/images/common_icon/icon_arrow_swap_horizontal.svg';
+const iconMicroPhone = 'assets/images/common_icon/icon_microphone.svg';
+const iconClipBoardText = 'assets/images/common_icon/icon_clipboard_text.svg';
+const iconCopy = 'assets/images/common_icon/icon_copy.svg';
+const iconShare = 'assets/images/common_icon/icon_share.svg';
+const iconSound = 'assets/images/common_icon/icon_sound.svg';
