@@ -1,10 +1,10 @@
 import 'dart:collection';
 import 'dart:math';
-import 'package:bhashaverse/utils/constants/api_constants.dart';
 import 'package:get/get.dart';
 
 import '../../enums/language_enum.dart';
 import '../../models/search_model.dart';
+import '../../utils/constants/api_constants.dart';
 
 class LanguageModelController extends GetxController {
   final Set<String> _allAvailableSourceLanguages = {};
