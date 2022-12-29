@@ -49,54 +49,118 @@ class APIConstants {
     'tts'
   ]; // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
 
+  static const kDevanagariName = 'devanagari_name';
+  static const kEnglishName = 'english_name';
+  static const kLanguageCode = 'language_code';
+  static const kLanguageCodeList = 'language_code_list';
+
   static final LANGUAGE_CODE_MAP = {
-    'language_codes': [
-      {'language_name': 'اردو', 'language_code': 'ur'},
-      {'language_name': 'ଓଡିଆ', 'language_code': 'or'},
-      {'language_name': 'தமிழ்', 'language_code': 'ta'},
-      {'language_name': 'हिन्दी', 'language_code': 'hi'},
-      {'language_name': 'डोगरी', 'language_code': 'doi'},
-      {'language_name': 'తెలుగు', 'language_code': 'te'},
-      {'language_name': 'नेपाली', 'language_code': 'ne'},
-      {'language_name': 'English', 'language_code': 'en'},
-      {'language_name': 'ਪੰਜਾਬੀ', 'language_code': 'pa'},
-      {'language_name': 'සිංහල', 'language_code': 'si'},
-      {'language_name': 'मराठी', 'language_code': 'mr'},
-      {'language_name': 'ಕನ್ನಡ', 'language_code': 'kn'},
-      {'language_name': 'বাংলা', 'language_code': 'bn'},
-      {'language_name': 'संस्कृत', 'language_code': 'sa'},
-      {'language_name': 'অসমীয়া', 'language_code': 'as'},
-      {'language_name': 'ગુજરાતી', 'language_code': 'gu'},
-      {'language_name': 'मैथिली', 'language_code': 'mai'},
-      {'language_name': 'भोजपुरी', 'language_code': 'bho'},
-      {'language_name': 'മലയാളം', 'language_code': 'ml'},
-      {'language_name': 'राजस्थानी', 'language_code': 'raj'},
-      {'language_name': 'Bodo', 'language_code': 'brx'},
-      {'language_name': 'মানিপুরি', 'language_code': 'mni'},
+    kLanguageCodeList: [
+      {kDevanagariName: 'اردو', kLanguageCode: 'ur', kEnglishName: 'Urdu'},
+      {kDevanagariName: 'ଓଡିଆ', kLanguageCode: 'or', kEnglishName: 'Oriya'},
+      {kDevanagariName: 'தமிழ்', kLanguageCode: 'ta', kEnglishName: 'Tamil'},
+      {kDevanagariName: 'हिन्दी', kLanguageCode: 'hi', kEnglishName: 'Hindi'},
+      {kDevanagariName: 'डोगरी', kLanguageCode: 'doi', kEnglishName: 'Dogri'},
+      {kDevanagariName: 'తెలుగు', kLanguageCode: 'te', kEnglishName: 'Telugu'},
+      {kDevanagariName: 'नेपाली', kLanguageCode: 'ne', kEnglishName: 'Nepali'},
+      {
+        kDevanagariName: 'English',
+        kLanguageCode: 'en',
+        kEnglishName: 'English'
+      },
+      {kDevanagariName: 'ਪੰਜਾਬੀ', kLanguageCode: 'pa', kEnglishName: 'Punjabi'},
+      {kDevanagariName: 'සිංහල', kLanguageCode: 'si', kEnglishName: 'Sinhala'},
+      {kDevanagariName: 'मराठी', kLanguageCode: 'mr', kEnglishName: 'Marathi'},
+      {kDevanagariName: 'ಕನ್ನಡ', kLanguageCode: 'kn', kEnglishName: 'Kannada'},
+      {kDevanagariName: 'বাংলা', kLanguageCode: 'bn', kEnglishName: 'Bangla'},
+      {
+        kDevanagariName: 'संस्कृत',
+        kLanguageCode: 'sa',
+        kEnglishName: 'Sanskrit'
+      },
+      {
+        kDevanagariName: 'অসমীয়া',
+        kLanguageCode: 'as',
+        kEnglishName: 'Assamese'
+      },
+      {
+        kDevanagariName: 'ગુજરાતી',
+        kLanguageCode: 'gu',
+        kEnglishName: 'Gujarati'
+      },
+      {
+        kDevanagariName: 'मैथिली',
+        kLanguageCode: 'mai',
+        kEnglishName: 'Maithili'
+      },
+      {
+        kDevanagariName: 'भोजपुरी',
+        kLanguageCode: 'bho',
+        kEnglishName: 'Bhojpuri'
+      },
+      {
+        kDevanagariName: 'മലയാളം',
+        kLanguageCode: 'ml',
+        kEnglishName: 'Malayalam'
+      },
+      {
+        kDevanagariName: 'राजस्थानी',
+        kLanguageCode: 'raj',
+        kEnglishName: 'Rajasthani'
+      },
+      {kDevanagariName: 'Bodo', kLanguageCode: 'brx', kEnglishName: 'Bodo'},
+      {
+        kDevanagariName: 'মানিপুরি',
+        kLanguageCode: 'mni',
+        kEnglishName: 'Manipuri'
+      },
     ]
   };
 
   static String getLanguageCodeOrName(
       {required String value,
-      required returnWhat,
+      required LanguageMap returnWhat,
       required Map<String, List<Map<String, String>>> lang_code_map}) {
     // If Language Code is to be returned that means the value received is a language name
     try {
-      if (returnWhat == LanguageMap.languageCode) {
-        var returningLangPair = lang_code_map['language_codes']!.firstWhere(
-            (eachLanguageCodeNamePair) =>
-                eachLanguageCodeNamePair['language_name']!.toLowerCase() ==
-                value.toLowerCase());
-        return returningLangPair['language_code'] ?? 'No Language Code Found';
+      switch (returnWhat) {
+        case LanguageMap.devanagariName:
+          var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
+              (eachLanguageCodeNamePair) =>
+                  eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
+                  value.toLowerCase());
+          return returningLangPair[kDevanagariName] ?? 'No Language Name Found';
+
+        case LanguageMap.englishName:
+          var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
+              (eachLanguageCodeNamePair) =>
+                  eachLanguageCodeNamePair[kDevanagariName]!.toLowerCase() ==
+                  value.toLowerCase());
+          return returningLangPair[kEnglishName] ?? 'No Language Name Found';
+
+        case LanguageMap.languageCode:
+          var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
+              (eachLanguageCodeNamePair) =>
+                  eachLanguageCodeNamePair[kDevanagariName]!.toLowerCase() ==
+                  value.toLowerCase());
+          return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
       }
 
-      var returningLangPair = lang_code_map['language_codes']!.firstWhere(
-          (eachLanguageCodeNamePair) =>
-              eachLanguageCodeNamePair['language_code']!.toLowerCase() ==
-              value.toLowerCase());
-      return returningLangPair['language_name'] ?? 'No Language Name Found';
+      // if (returnWhat == LanguageMap.languageCode) {
+      //   var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
+      //       (eachLanguageCodeNamePair) =>
+      //           eachLanguageCodeNamePair[kDevanagariName]!.toLowerCase() ==
+      //           value.toLowerCase());
+      //   return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
+      // }
+
+      // var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
+      //     (eachLanguageCodeNamePair) =>
+      //         eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
+      //         value.toLowerCase());
+      // return returningLangPair[kDevanagariName] ?? 'No Language Name Found';
     } catch (e) {
-      return 'No Return Value Found';
+      return 'No Language Found';
     }
   }
 }
