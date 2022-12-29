@@ -230,7 +230,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
             dynamic selectedSourceLangIndex = await Get.toNamed(
-                AppRoutes.translateFrom,
+                AppRoutes.languageSelectionRoute,
                 arguments: _languageModelController.allAvailableSourceLanguages
                     .toList());
             if (selectedSourceLangIndex != null) {
@@ -277,7 +277,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
             dynamic selectedTargetLangIndex = await Get.toNamed(
-                AppRoutes.translateFrom,
+                AppRoutes.languageSelectionRoute,
                 arguments: _languageModelController.allAvailableTargetLanguages
                     .toList());
             if (selectedTargetLangIndex != null) {

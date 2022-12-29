@@ -19,7 +19,7 @@ class AppRoutes {
   static String voiceAssistantRoute = '/voice_assistant_route';
   static String onboardingRoute = '/onboarding_route';
   static String bottomNavTranslation = '/bottom_nav_translation';
-  static String translateFrom = '/translate_from_route';
+  static String languageSelectionRoute = '/language_selection_route';
 
   static List<GetPage> pages = [
     GetPage(
@@ -48,7 +48,7 @@ class AppRoutes {
       binding: HomeBinding(),
     ),
     GetPage(
-      name: translateFrom,
+      name: languageSelectionRoute,
       page: () => const LanguageSelectionScreen(),
       binding: LanguageSelectionBinding(),
     ),
