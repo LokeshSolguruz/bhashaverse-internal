@@ -1,6 +1,9 @@
 // App Strings
 const appName = 'Bhashaverse';
+
+// Database constants
 const hiveDBName = 'db_bhashaverse';
+const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 
 class AppStrings {
   //Select App Language Screen
