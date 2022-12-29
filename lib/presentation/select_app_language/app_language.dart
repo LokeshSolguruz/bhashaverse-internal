@@ -81,9 +81,6 @@ class _AppLanguageState extends State<AppLanguage> {
                             subTitle: _appLanguageController
                                 .getAppLanguageList()[index]
                                 .subTitle,
-                            imageUrl: _appLanguageController
-                                .getAppLanguageList()[index]
-                                .image,
                             onItemTap: () => _appLanguageController
                                 .setSelectedLanguageIndex(index),
                             index: index,
