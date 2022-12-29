@@ -9,7 +9,6 @@ import '../../../utils/constants/app_constants.dart';
 import '../../../utils/remove_glow_effect.dart';
 import '../../../utils/theme/app_colors.dart';
 import '../../../utils/theme/app_text_style.dart';
-import '../bottom_nav_screens/bottom_nav_translation/controller/bottom_nav_translation_controller.dart';
 import 'controller/language_selection_controller.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -21,7 +20,6 @@ class LanguageSelectionScreen extends StatefulWidget {
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
-  late BottomNavTranslationController _translationController;
   late LanguageSelectionController _translateFromController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
@@ -29,7 +27,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   @override
   void initState() {
-    _translationController = Get.find();
     _translateFromController = Get.find();
     _languageSearchController = TextEditingController();
     ScreenUtil().init();
