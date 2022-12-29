@@ -1,4 +1,5 @@
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -69,10 +70,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                 GestureDetector(
                                   onTap: () {
                                     _bottomNavTranslationController
-                                        .inputFieldController.value
+                                        .sourceLanTextController
                                         .clear();
                                     _bottomNavTranslationController
-                                        .targetLangTextController.value
+                                        .targetLangTextController
                                         .clear();
                                     _bottomNavTranslationController
                                         .isMicButtonTapped.value = false;
@@ -93,11 +94,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                           ),
                           TextField(
                             controller: _bottomNavTranslationController
-                                .inputFieldController.value,
+                                .sourceLanTextController,
                             focusNode: _sourceLangFocusNode,
                             onChanged: (_) {
                               if (_bottomNavTranslationController
-                                  .inputFieldController.value.text.isEmpty) {
+                                  .sourceLanTextController.value.text.isEmpty) {
                                 _bottomNavTranslationController
                                     .isVisible.value = true;
                               } else {
@@ -142,11 +143,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                     TextField(
                                       controller:
                                           _bottomNavTranslationController
-                                              .targetLangTextController.value,
+                                              .targetLangTextController,
                                       focusNode: _transLangFocusNode,
                                       onChanged: (_) {
                                         if (_bottomNavTranslationController
-                                            .inputFieldController
+                                            .sourceLanTextController
                                             .value
                                             .text
                                             .isEmpty) {
@@ -345,25 +346,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             if (_bottomNavTranslationController
                 .isSourceAndTargetLangSelected()) {
               if (!_bottomNavTranslationController.isMicButtonTapped.value) {
-                _bottomNavTranslationController.isMicButtonTapped.value = true;
-                _bottomNavTranslationController.inputFieldController.value
-                    .clear();
-                _bottomNavTranslationController.targetLangTextController.value
-                    .clear();
-                _bottomNavTranslationController.isTranslateCompleted.value =
-                    false;
+                _bottomNavTranslationController.startVoiceRecording();
               } else {
-                _bottomNavTranslationController.isTranslateCompleted.value =
-                    true;
                 _bottomNavTranslationController
-                    .inputFieldController.value.text = 'Good morning';
-                _bottomNavTranslationController
-                    .targetLangTextController.value.text = 'शुभ प्रभात';
-                _bottomNavTranslationController.isMicButtonTapped.value = false;
+                    .stopVoiceRecordingAndGetResult();
               }
             } else {
-              _bottomNavTranslationController
-                  .showErrorSourceAndTargetNotSelected();
+              showDefaultSnackbar(
+                  message: AppStrings.kErrorSelectSourceAndTargetScreen);
             }
           },
           backgroundColor: flushOrangeColor,

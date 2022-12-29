@@ -81,18 +81,22 @@ class TranslationAppAPIClient {
     }
   }
 
-  Future<dynamic> sendTranslationRequest({required transPayload}) async {
+  Future<Result<AppException, dynamic>> sendTranslationRequest(
+      {required transPayload}) async {
     try {
       var response = await _dio.post(APIConstants.TRANS_REQ_URL,
           data: transPayload,
           options: Options(
               headers: {'Content-Type': 'application/json', 'Accept': '*/*'}));
-      if (response.statusCode == 200) {
-        return response.data;
+      return Result.success(response.data['output'][0]);
+    } on DioError catch (error) {
+      return Result.failure(
+          AppException(NetworkError(error).getErrorModel().errorMessage));
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print('Other Exception::: ${error.toString()}');
       }
-      return {};
-    } catch (e) {
-      return {};
+      return Result.failure(AppException('Something went wrong'));
     }
   }
 
