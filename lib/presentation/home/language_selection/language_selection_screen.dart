@@ -1,36 +1,43 @@
-import 'package:bhashaverse/presentation/home/bottom_nav_screens/bottom_nav_translation/controller/bottom_nav_translation_controller.dart';
+import 'package:bhashaverse/utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-
 import '../../../common/language_selection_widget.dart';
+import '../../../enums/language_enum.dart';
+import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/remove_glow_effect.dart';
-import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/theme/app_colors.dart';
 import '../../../utils/theme/app_text_style.dart';
-import 'controller/target_language_controller.dart';
+import '../bottom_nav_screens/bottom_nav_translation/controller/bottom_nav_translation_controller.dart';
+import 'controller/language_selection_controller.dart';
 
-class TargetLanguageScreen extends StatefulWidget {
-  const TargetLanguageScreen({super.key});
+class LanguageSelectionScreen extends StatefulWidget {
+  const LanguageSelectionScreen({super.key});
 
   @override
-  State<TargetLanguageScreen> createState() => _TargetLanguageScreenState();
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
 }
 
-class _TargetLanguageScreenState extends State<TargetLanguageScreen> {
+class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   late BottomNavTranslationController _translationController;
-  late TargetLanguageController _translateToController;
+  late LanguageSelectionController _translateFromController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
+  List<dynamic> languagesList = [];
 
   @override
   void initState() {
     _translationController = Get.find();
-    _translateToController = Get.find();
+    _translateFromController = Get.find();
     _languageSearchController = TextEditingController();
     ScreenUtil().init();
     super.initState();
+    var langFromArgument = Get.arguments;
+    if (langFromArgument != null && langFromArgument.isNotEmpty) {
+      languagesList = langFromArgument;
+    }
   }
 
   @override
@@ -51,35 +58,21 @@ class _TargetLanguageScreenState extends State<TargetLanguageScreen> {
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
                   child: ListView.builder(
-                    itemCount:
-                        _translateToController.getAppLanguageList().length,
+                    itemCount: languagesList.length,
                     itemBuilder: (context, index) {
                       return Obx(
                         () {
                           return LanguageSelectionWidget(
-                            title: _translateToController
-                                .getAppLanguageList()[index]
-                                .title,
-                            subTitle: _translateToController
-                                .getAppLanguageList()[index]
-                                .subTitle,
-                            imageUrl: _translateToController
-                                .getAppLanguageList()[index]
-                                .image,
+                            title: languagesList[index],
+                            subTitle: APIConstants.getLanguageCodeOrName(
+                                value: languagesList[index],
+                                returnWhat: LanguageMap.englishName,
+                                lang_code_map: APIConstants.LANGUAGE_CODE_MAP),
                             onItemTap: () async {
-                              _translateToController
-                                  .setSelectedLanguageIndex(index);
-                              _translationController.targetLanguage.value =
-                                  _translateToController
-                                      .getAppLanguageList()[index];
-                              if (_focusNodeLanguageSearch.hasFocus) {
-                                await Future.delayed(
-                                    const Duration(milliseconds: 200));
-                              }
-                              Get.back(result: ['true']);
+                              Get.back(result: index);
                             },
                             index: index,
-                            selectedIndex: _translateToController
+                            selectedIndex: _translateFromController
                                 .getSelectedLanguageIndex(),
                           );
                         },
@@ -144,7 +137,7 @@ class _TargetLanguageScreenState extends State<TargetLanguageScreen> {
         ),
         SizedBox(width: 24.toWidth),
         Text(
-          AppStrings.kTranslateTargetTitle,
+          AppStrings.kTranslateSourceTitle,
           style: AppTextStyle().semibold24BalticSea,
         ),
       ],
