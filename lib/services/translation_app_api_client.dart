@@ -33,6 +33,7 @@ class TranslationAppAPIClient {
     try {
       final asrTranslationTtsResponses =
           await Future.wait(taskPayloads.map((eachTaskPayload) {
+        /// TODO: Handel when perticular model not available
         return _dio.post(APIConstants.SEARCH_REQ_URL, data: eachTaskPayload);
       }));
 
