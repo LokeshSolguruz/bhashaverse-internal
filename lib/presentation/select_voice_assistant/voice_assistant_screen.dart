@@ -27,7 +27,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
     super.initState();
     ScreenUtil().init();
     _voiceAssistantController = Get.put(VoiceAssistantController());
-    var selectedGender = hiveDBInstance.get(preferredVoiceAssistant);
+    var selectedGender = hiveDBInstance.get(preferredVoiceAssistantGender);
     if (selectedGender != null && selectedGender.isNotEmpty) {
       _voiceAssistantController
           .setSelectedGender(GenderEnum.values.byName(selectedGender));
@@ -100,7 +100,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
           borderRadius: BorderRadius.circular(8),
           onTap: () {
             _voiceAssistantController.setSelectedGender(gender);
-            hiveDBInstance.put(preferredVoiceAssistant, gender.name);
+            hiveDBInstance.put(preferredVoiceAssistantGender, gender.name);
           },
           child: Container(
             padding: AppEdgeInsets.instance.all(22),
