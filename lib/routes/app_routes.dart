@@ -18,7 +18,6 @@ class AppRoutes {
   static String appLanguageRoute = '/app_language_route';
   static String voiceAssistantRoute = '/voice_assistant_route';
   static String onboardingRoute = '/onboarding_route';
-  static String bottomNavTranslation = '/bottom_nav_translation';
   static String languageSelectionRoute = '/language_selection_route';
 
   static List<GetPage> pages = [
