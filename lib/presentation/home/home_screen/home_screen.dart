@@ -32,9 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Obx(
-          () => _homeController.isModelsLoading.value
-              ? const Center(child: CircularProgressIndicator())
-              : getCurrentBottomWidget(_homeController.bottomBarIndex.value),
+          () =>
+
+              /// TODO: use proper laoding widget
+              _homeController.isModelsLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : getCurrentBottomWidget(
+                      _homeController.bottomBarIndex.value),
         ),
       ),
       bottomNavigationBar: Obx(
