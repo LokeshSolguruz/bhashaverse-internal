@@ -71,6 +71,11 @@ class AppStrings {
   static const kPaste = 'Paste';
   static const kTranslate = 'Translate';
   static const kClearAll = 'Clear All';
+  static const kErrorSelectSourceAndTargetScreen =
+      'Please select source and target language first';
+  static const errorMicStoragePermission =
+      'Mic and Storage permission required for recording sound';
+  static const errorInRecording = 'Error voice recording';
 }
 
 //common
@@ -78,6 +83,7 @@ const appName = 'Bhashaverse';
 const hiveDBName = 'db_bhashaverse';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
+const defaultAudioRecordingName = 'ASRAudio.wav';
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
