@@ -229,14 +229,25 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           onTap: () async {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
+
+            List<dynamic> sourceLanguageList =
+                _languageModelController.allAvailableSourceLanguages.toList();
+
+            if (_bottomNavTranslationController
+                .selectedTargetLanguage.value.isNotEmpty) {
+              sourceLanguageList.removeWhere((eachAvailableSourceLanguage) {
+                return eachAvailableSourceLanguage ==
+                    _bottomNavTranslationController
+                        .selectedTargetLanguage.value;
+              });
+            }
+
             dynamic selectedSourceLangIndex = await Get.toNamed(
                 AppRoutes.languageSelectionRoute,
-                arguments: _languageModelController.allAvailableSourceLanguages
-                    .toList());
+                arguments: sourceLanguageList);
             if (selectedSourceLangIndex != null) {
               _bottomNavTranslationController.selectedSourceLanguage.value =
-                  _languageModelController
-                      .allAvailableSourceLanguages[selectedSourceLangIndex];
+                  sourceLanguageList[selectedSourceLangIndex];
             }
           },
           child: Container(
@@ -276,14 +287,25 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           onTap: () async {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
+
+            List<dynamic> targetLanguageList =
+                _languageModelController.allAvailableTargetLanguages.toList();
+
+            if (_bottomNavTranslationController
+                .selectedSourceLanguage.value.isNotEmpty) {
+              targetLanguageList.removeWhere((eachAvailableTargetLanguage) {
+                return eachAvailableTargetLanguage ==
+                    _bottomNavTranslationController
+                        .selectedSourceLanguage.value;
+              });
+            }
+
             dynamic selectedTargetLangIndex = await Get.toNamed(
                 AppRoutes.languageSelectionRoute,
-                arguments: _languageModelController.allAvailableTargetLanguages
-                    .toList());
+                arguments: targetLanguageList);
             if (selectedTargetLangIndex != null) {
               _bottomNavTranslationController.selectedTargetLanguage.value =
-                  _languageModelController
-                      .allAvailableTargetLanguages[selectedTargetLangIndex];
+                  targetLanguageList[selectedTargetLangIndex];
             }
           },
           child: Container(
