@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../widgets/custom_bottom_bar.dart';
 import '../../../utils/theme/app_colors.dart';
 import 'controller/home_controller.dart';
-import '../bottom_nav_screens/bottom_nav_chat/bottom_nav_chat.dart';
 import '../bottom_nav_screens/bottom_nav_settings/bottom_nav_settings.dart';
 import '../bottom_nav_screens/bottom_nav_translation/bottom_nav_translation_screen.dart';
 
@@ -34,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Obx(
           () =>
 
-              /// TODO: use proper laoding widget
+              // TODO: use proper laoding widget
               _homeController.isModelsLoading.value
                   ? const Center(child: CircularProgressIndicator())
                   : getCurrentBottomWidget(
@@ -56,9 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (index) {
       case 0:
         return const BottomNavTranslation();
+      // TODO: uncomment after chat feature added
+      // case 1:
+      //   return const BottomNavChat();
       case 1:
-        return const BottomNavChat();
-      case 2:
         return const BottomNavSettings();
       default:
         return const BottomNavTranslation();
