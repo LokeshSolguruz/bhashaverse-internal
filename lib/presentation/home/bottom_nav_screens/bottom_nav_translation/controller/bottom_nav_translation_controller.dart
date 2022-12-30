@@ -1,8 +1,11 @@
 import 'package:bhashaverse/common/controller/language_model_controller.dart';
+import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:bhashaverse/enums/language_enum.dart';
+import 'package:bhashaverse/utils/audio_player.dart';
 import 'package:bhashaverse/utils/voice_recorder.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
@@ -19,17 +22,23 @@ class BottomNavTranslationController extends GetxController {
 
   RxBool isTranslateCompleted = false.obs;
   RxBool isMicButtonTapped = false.obs;
-  RxBool isVisible = true.obs;
   bool isMicStoragePermissionGranted = false;
+  RxBool isLsLoading = false.obs;
   RxString selectedSourceLanguage = ''.obs;
   RxString selectedTargetLanguage = ''.obs;
+  dynamic sourceTTSResponse;
+  dynamic targetTTSResponse;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  late final Box _hiveDBInstance;
 
   @override
   void onInit() {
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
+    _hiveDBInstance = Hive.box(hiveDBName);
     super.onInit();
   }
 
@@ -76,6 +85,17 @@ class BottomNavTranslationController extends GetxController {
     }
   }
 
+  String getSelectedSourceLangCode() => APIConstants.getLanguageCodeOrName(
+        value: selectedSourceLanguage.value,
+        returnWhat: LanguageMap.languageCode,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP,
+      );
+
+  String getSelectedTargetLangCode() => APIConstants.getLanguageCodeOrName(
+      value: selectedTargetLanguage.value,
+      returnWhat: LanguageMap.languageCode,
+      lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+
   void startVoiceRecording() async {
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
       isMicStoragePermissionGranted = isPermissionGranted;
@@ -101,22 +121,17 @@ class BottomNavTranslationController extends GetxController {
       return;
     } else {
       await getASROutput(base64EncodedAudioContent);
-      isTranslateCompleted.value = true;
     }
   }
 
   Future<void> getASROutput(String base64EncodedAudioContent) async {
-    String selectedSourceLanguageCode = APIConstants.getLanguageCodeOrName(
-        value: selectedSourceLanguage.value,
-        returnWhat: LanguageMap.languageCode,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
-
+    isLsLoading.value = true;
     var asrPayloadToSend = {};
     asrPayloadToSend['modelId'] = _languageModelController
-        .getAvailableASRModelsForLanguage(selectedSourceLanguageCode);
+        .getAvailableASRModelsForLanguage(getSelectedSourceLangCode());
     asrPayloadToSend['task'] = 'asr';
     asrPayloadToSend['audioContent'] = base64EncodedAudioContent;
-    asrPayloadToSend['source'] = selectedSourceLanguageCode;
+    asrPayloadToSend['source'] = getSelectedSourceLangCode();
     asrPayloadToSend['userId'] = null;
 
     var response = await _translationAppAPIClient.sendASRRequest(
@@ -125,30 +140,23 @@ class BottomNavTranslationController extends GetxController {
     response.when(
       success: (data) async {
         sourceLanTextController.text = data['source'];
-        translateSourceLanguage();
+        await translateSourceLanguage();
       },
       failure: (error) {
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
+        isTranslateCompleted.value = true;
+        isLsLoading.value = false;
       },
     );
   }
 
   Future<void> translateSourceLanguage() async {
-    String selectedSourceLanguageCode = APIConstants.getLanguageCodeOrName(
-        value: selectedSourceLanguage.value,
-        returnWhat: LanguageMap.languageCode,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
-
-    String selectedTargetLanguageCode = APIConstants.getLanguageCodeOrName(
-        value: selectedTargetLanguage.value,
-        returnWhat: LanguageMap.languageCode,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
-
+    isLsLoading.value = true;
     var transPayload = {};
     transPayload['modelId'] =
         _languageModelController.getAvailableTranslationModel(
-            selectedSourceLanguageCode, selectedTargetLanguageCode);
+            getSelectedSourceLangCode(), getSelectedTargetLangCode());
     transPayload['task'] = 'translation';
     List<Map<String, dynamic>> source = [
       {'source': sourceLanTextController.text}
@@ -161,13 +169,82 @@ class BottomNavTranslationController extends GetxController {
         transPayload: transPayload);
 
     transResponse.when(
-      success: (data) {
+      success: (data) async {
         targetLangTextController.text = data['target'];
+        await getTTSOutput();
       },
       failure: (error) {
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
+        isTranslateCompleted.value = true;
+        isLsLoading.value = false;
       },
     );
+  }
+
+  Future<void> getTTSOutput() async {
+    GenderEnum? preferredGender = GenderEnum.values
+        .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
+    var ttsPayloadForSourceLang = {};
+
+    ttsPayloadForSourceLang['input'] = [
+      {'source': ''}
+    ];
+
+    ttsPayloadForSourceLang['modelId'] = _languageModelController
+        .getAvailableTTSModel(getSelectedSourceLangCode());
+    ttsPayloadForSourceLang['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
+    ttsPayloadForSourceLang['input'][0]['source'] =
+        sourceLanTextController.text;
+    ttsPayloadForSourceLang['gender'] =
+        preferredGender == GenderEnum.male ? 'male' : 'female';
+
+    var ttsPayloadForTargetLang = {};
+    ttsPayloadForTargetLang.addAll(ttsPayloadForSourceLang);
+    ttsPayloadForTargetLang['modelId'] = _languageModelController
+        .getAvailableTTSModel(getSelectedTargetLangCode());
+    ttsPayloadForTargetLang['input'][0]['source'] =
+        targetLangTextController.text;
+
+    var responseList = await _translationAppAPIClient.sendTTSReqForBothGender(
+        ttsPayloadList: [ttsPayloadForSourceLang, ttsPayloadForTargetLang]);
+
+    responseList.when(
+      success: (data) {
+        List<String> ttsResponse = [
+          data[0]['output']['audio'][0]['audioContent'] ?? '',
+          data[1]['output']['audio'][0]['audioContent'] ?? ''
+        ];
+        sourceTTSResponse = ttsResponse[0];
+        targetTTSResponse = ttsResponse[1];
+        isTranslateCompleted.value = true;
+        isLsLoading.value = false;
+        return ttsResponse;
+      },
+      failure: (error) {
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        isTranslateCompleted.value = true;
+        isLsLoading.value = false;
+      },
+    );
+  }
+
+  void playTTSOutput(bool playingForTarget) async {
+    await PermissionHandler.requestPermissions().then((isPermissionGranted) {
+      isMicStoragePermissionGranted = isPermissionGranted;
+    });
+    if (isMicStoragePermissionGranted) {
+      String? ttsOutputBase64String;
+
+      ttsOutputBase64String =
+          playingForTarget ? targetTTSResponse : sourceTTSResponse;
+
+      if (ttsOutputBase64String != null && ttsOutputBase64String.isNotEmpty) {
+        _audioPlayer.playAudioFromBase64(ttsOutputBase64String);
+      } else {
+        showDefaultSnackbar(message: AppStrings.noVoiceAssistantAvailable);
+      }
+    }
   }
 }
