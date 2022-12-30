@@ -401,8 +401,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
         SizedBox(width: 8.toWidth),
         InkWell(
           onTap: () {
-            //: TODO: fix source TTS issue
-            // _bottomNavTranslationController.playTTSOutput(isForTargetSection);
+            _bottomNavTranslationController.playTTSOutput(isForTargetSection);
           },
           child: SvgPicture.asset(
             iconSound,

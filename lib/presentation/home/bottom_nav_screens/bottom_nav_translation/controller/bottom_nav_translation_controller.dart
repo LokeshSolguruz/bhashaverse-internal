@@ -188,7 +188,7 @@ class BottomNavTranslationController extends GetxController {
     var ttsPayloadForSourceLang = {};
 
     ttsPayloadForSourceLang['input'] = [
-      {'source': ''}
+      {'source': sourceLanTextController.text}
     ];
 
     ttsPayloadForSourceLang['modelId'] = _languageModelController
@@ -200,11 +200,14 @@ class BottomNavTranslationController extends GetxController {
         preferredGender == GenderEnum.male ? 'male' : 'female';
 
     var ttsPayloadForTargetLang = {};
+
     ttsPayloadForTargetLang.addAll(ttsPayloadForSourceLang);
     ttsPayloadForTargetLang['modelId'] = _languageModelController
         .getAvailableTTSModel(getSelectedTargetLangCode());
-    ttsPayloadForTargetLang['input'][0]['source'] =
-        targetLangTextController.text;
+
+    ttsPayloadForTargetLang['input'] = [
+      {'source': targetLangTextController.text}
+    ];
 
     var responseList = await _translationAppAPIClient.sendTTSReqForBothGender(
         ttsPayloadList: [ttsPayloadForSourceLang, ttsPayloadForTargetLang]);
