@@ -277,4 +277,61 @@ class LanguageModelController extends GetxController {
             Random().nextInt(availableTransModelsForSelectedLangInUI.length)];
     return transModelIDToUse;
   }
+
+  String getAvailableTTSModel(String languageCode) {
+    List<String> availableTTSModelsForSelectedLangInUIDefault = [];
+    List<String> availableTTSModelsForSelectedLangInUI = [];
+    bool isAtLeastOneDefaultModelTypeFound = false;
+
+    List<String> availableSubmittersList = [];
+    for (var eachAvailableTTSModelData in availableTTSModels.data) {
+      if (eachAvailableTTSModelData.languages[0].sourceLanguage ==
+          languageCode) {
+        if (!availableSubmittersList
+            .contains(eachAvailableTTSModelData.name.toLowerCase())) {
+          availableSubmittersList
+              .add(eachAvailableTTSModelData.name.toLowerCase());
+        }
+      }
+    }
+    availableSubmittersList = availableSubmittersList.toSet().toList();
+
+    //Check AI4Bharat model availability
+    String ai4BharatModelName = '';
+    for (var eachSubmitter in availableSubmittersList) {
+      if (eachSubmitter.toLowerCase().contains(APIConstants
+          .DEFAULT_MODEL_TYPES[APIConstants.TYPES_OF_MODELS_LIST[2]]!
+          .split(',')[0]
+          .toLowerCase())) {
+        ai4BharatModelName = eachSubmitter;
+      }
+    }
+
+    if (ai4BharatModelName.isNotEmpty) {
+      for (var eachAvailableTTSModelData in availableTTSModels.data) {
+        if (eachAvailableTTSModelData.name.toLowerCase() ==
+            ai4BharatModelName.toLowerCase()) {
+          availableTTSModelsForSelectedLangInUIDefault
+              .add(eachAvailableTTSModelData.modelId);
+          isAtLeastOneDefaultModelTypeFound = true;
+        }
+      }
+    } else {
+      for (var eachAvailableTTSModelData in availableTTSModels.data) {
+        if (eachAvailableTTSModelData.languages[0].sourceLanguage ==
+            languageCode) {
+          availableTTSModelsForSelectedLangInUI
+              .add(eachAvailableTTSModelData.modelId);
+        }
+      }
+    }
+
+    //Either select default model (vakyansh for now) or any random model from the available list.
+    String ttsModelIDToUse = isAtLeastOneDefaultModelTypeFound
+        ? availableTTSModelsForSelectedLangInUIDefault[Random()
+            .nextInt(availableTTSModelsForSelectedLangInUIDefault.length)]
+        : availableTTSModelsForSelectedLangInUI[
+            Random().nextInt(availableTTSModelsForSelectedLangInUI.length)];
+    return ttsModelIDToUse;
+  }
 }
