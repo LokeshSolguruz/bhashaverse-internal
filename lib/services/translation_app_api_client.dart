@@ -115,7 +115,7 @@ class TranslationAppAPIClient {
     }
   }
 
-  Future<dynamic> sendTTSReqForBothGender(
+  Future<Result<AppException, dynamic>> sendTTSReqForBothGender(
       {required List<dynamic> ttsPayloadList}) async {
     try {
       final ttsResponsesList = await Future.wait(ttsPayloadList.map(
@@ -138,17 +138,23 @@ class TranslationAppAPIClient {
             'gender': ttsPayloadList[eachResponse.key]['gender'],
             'output': eachResponse.value.data
           });
-        } else {
-          ttsOutputResponsesList.add({
-            'gender': ttsPayloadList[eachResponse.key]['gender'],
-            'output': eachResponse.value.data
-          });
         }
       }).toList();
-
-      return ttsOutputResponsesList;
-    } on Exception {
-      return [];
+      if (ttsOutputResponsesList.isNotEmpty) {
+        return Result.success(ttsOutputResponsesList);
+      } else {
+        return Result.failure(
+            AppException(APIConstants.kErrorMessageGenericError));
+      }
+    } on DioError catch (error) {
+      return Result.failure(
+          AppException(NetworkError(error).getErrorModel().errorMessage));
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print('Other Exception::: ${error.toString()}');
+      }
+      return Result.failure(
+          AppException(APIConstants.kErrorMessageGenericError));
     }
   }
 }
