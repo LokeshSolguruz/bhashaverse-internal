@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bhashaverse/utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -35,36 +36,40 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: sassyGreen,
       resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Obx(
-          () => Stack(
-            clipBehavior: Clip.none,
-            children: [
-              getCurrentBottomWidget(_homeController.bottomBarIndex.value),
-              if (_homeController.isModelsLoading.value ||
-                  _bottomNavTranslationController.isLsLoading.value)
-                LottieAnimation(
-                    context: context,
-                    lottieAsset: _homeController.isModelsLoading.value
-                        ? animationHomeLoading
-                        : animationTranslationLoading,
-                    footerText: _homeController.isModelsLoading.value
-                        ? AppStrings.kHomeLoadingAnimationText
-                        : AppStrings.kTranslationLoadingAnimationText),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Obx(
-        () => _homeController.isModelsLoading.value ||
-                _bottomNavTranslationController.isLsLoading.value
-            ? const SizedBox.shrink()
-            : CustomBottomBar(
+      body: Obx(
+        () => Stack(
+          // clipBehavior: Clip.none,
+          children: [
+            Positioned(
+                top: 30.toHeight,
+                bottom: 100.toHeight,
+                left: 0,
+                right: 0,
+                child: getCurrentBottomWidget(
+                    _homeController.bottomBarIndex.value)),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: CustomBottomBar(
                 currentIndex: _homeController.bottomBarIndex.value,
                 onChanged: (int index) {
                   _homeController.bottomBarIndex.value = index;
                 },
               ),
+            ),
+            if (_homeController.isModelsLoading.value ||
+                _bottomNavTranslationController.isLsLoading.value)
+              LottieAnimation(
+                  context: context,
+                  lottieAsset: _homeController.isModelsLoading.value
+                      ? animationHomeLoading
+                      : animationTranslationLoading,
+                  footerText: _homeController.isModelsLoading.value
+                      ? AppStrings.kHomeLoadingAnimationText
+                      : AppStrings.kTranslationLoadingAnimationText),
+          ],
+        ),
       ),
     );
   }
