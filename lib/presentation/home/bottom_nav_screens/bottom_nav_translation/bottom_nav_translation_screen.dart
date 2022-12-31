@@ -41,7 +41,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
       child: Column(
         children: [
           SizedBox(
-            height: 46.toHeight,
+            height: 16.toHeight,
+          ),
+          Text(
+            appName,
+            style: AppTextStyle().semibold22BalticSea,
+          ),
+          SizedBox(
+            height: 16.toHeight,
           ),
           Expanded(
             flex: 5,
