@@ -11,3 +11,4 @@ const Color japaneseLaurel = Color(0xFF128807);
 const Color americanSilver = Color(0xFFCDCED1);
 const Color arsenicColor = Color(0xFF393B47);
 const Color approxKarry = Color(0xFFFFE0C2);
+const Color brightGrey = Color(0xFF51545E);

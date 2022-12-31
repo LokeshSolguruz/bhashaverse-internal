@@ -378,31 +378,37 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
 
   Widget _buildSourceTargetTextActions(bool isForTargetSection) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SvgPicture.asset(
           iconShare,
-          height: 20.toWidth,
-          width: 20.toWidth,
-          color: dolphinGray,
+          height: 24.toWidth,
+          width: 24.toWidth,
+          color: brightGrey,
         ),
-        SizedBox(width: 8.toWidth),
+        SizedBox(width: 24.toWidth),
         SvgPicture.asset(
           iconCopy,
-          height: 20.toWidth,
-          width: 20.toWidth,
-          color: dolphinGray,
+          height: 24.toWidth,
+          width: 24.toWidth,
+          color: brightGrey,
         ),
-        SizedBox(width: 8.toWidth),
+        const Spacer(),
         InkWell(
           onTap: () {
             _bottomNavTranslationController.playTTSOutput(isForTargetSection);
           },
-          child: SvgPicture.asset(
-            iconSound,
-            height: 20.toWidth,
-            width: 20.toWidth,
-            color: dolphinGray,
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: flushOrangeColor,
+            ),
+            padding: AppEdgeInsets.instance.all(8),
+            child: SvgPicture.asset(
+              iconSound,
+              height: 24.toWidth,
+              width: 24.toWidth,
+              color: balticSea,
+            ),
           ),
         ),
       ],
