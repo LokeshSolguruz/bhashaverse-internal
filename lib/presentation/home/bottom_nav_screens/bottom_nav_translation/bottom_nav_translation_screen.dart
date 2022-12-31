@@ -132,7 +132,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                     .isTranslateCompleted.value,
                                 child: Column(
                                   children: [
-                                    const Divider(),
+                                    const Divider(color: dolphinGray),
+                                    SizedBox(
+                                      height: 6.toHeight,
+                                    ),
                                     if (_bottomNavTranslationController
                                         .isSourceAndTargetLangSelected())
                                       Align(
