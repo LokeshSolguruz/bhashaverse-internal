@@ -43,11 +43,19 @@ class APIConstants {
   static const String kErrorMessageUnAuthorizedException =
       'UnAuthorized. Please login again';
 
+// This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
   static final List<String> TYPES_OF_MODELS_LIST = [
     'asr',
     'translation',
     'tts'
-  ]; // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
+  ];
+
+  // Keys shall be same as values in TYPES_OF_MODELS_LIST
+  static final DEFAULT_MODEL_TYPES = {
+    TYPES_OF_MODELS_LIST[0]: 'OpenAI,AI4Bharat,batch,stream',
+    TYPES_OF_MODELS_LIST[1]: 'AI4Bharat,',
+    TYPES_OF_MODELS_LIST[2]: 'AI4Bharat,',
+  };
 
   static const kDevanagariName = 'devanagari_name';
   static const kEnglishName = 'english_name';

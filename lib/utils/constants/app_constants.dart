@@ -68,9 +68,18 @@ class AppStrings {
   static const kTranslateSourceTitle = 'Translate from';
   static const kTranslateTargetTitle = 'Translate to';
   static const kTranslationHintText = 'Start typing or press mic to Begin';
+  static const kListeningHintText = 'Listening, Speak now...';
   static const kPaste = 'Paste';
   static const kTranslate = 'Translate';
   static const kClearAll = 'Clear All';
+  static const kErrorNoSourceText = 'Please enter text first';
+  static const kErrorSelectSourceAndTargetScreen =
+      'Please select source and target language first';
+  static const errorMicStoragePermission =
+      'Mic and Storage permission required for recording sound';
+  static const errorInRecording = 'Error voice recording';
+  static const noVoiceAssistantAvailable =
+      'No voice assistant available for following language';
 }
 
 //common
@@ -78,6 +87,8 @@ const appName = 'Bhashaverse';
 const hiveDBName = 'db_bhashaverse';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
+const defaultAudioRecordingName = 'ASRAudio.wav';
+const defaultTTSPlayName = 'TTSAudio.wav';
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
