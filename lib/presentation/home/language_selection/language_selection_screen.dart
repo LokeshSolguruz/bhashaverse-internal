@@ -54,7 +54,12 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
-                  child: ListView.builder(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: 8.toHeight,
+                      crossAxisCount: 2,
+                      childAspectRatio: 2,
+                    ),
                     itemCount: languagesList.length,
                     itemBuilder: (context, index) {
                       return Obx(
