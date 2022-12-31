@@ -9,16 +9,31 @@ import 'constants/app_constants.dart';
 class AudioPlayer {
   final FlutterSoundPlayer _audioPlayer = FlutterSoundPlayer();
 
+  File? _audioFile;
+  Directory? appDocDir;
+  String _ttsAudioFileName = '';
+
   void playAudioFromBase64(String base64Text) async {
-    var maleFileAsBytes = base64Decode(base64Text);
-    Directory? appDocDir = await getExternalStorageDirectory();
-    String maleTTSAudioFileName = '${appDocDir!.path}/$defaultTTSPlayName';
-    final maleAudioFile = File(maleTTSAudioFileName);
-    await maleAudioFile.writeAsBytes(maleFileAsBytes);
+    var fileAsBytes = base64Decode(base64Text);
+    appDocDir = await getExternalStorageDirectory();
+    _ttsAudioFileName = '${appDocDir!.path}/$defaultTTSPlayName';
+    _audioFile = File(_ttsAudioFileName);
+    if (_audioFile != null && !await _audioFile!.exists()) {
+      await _audioFile!.writeAsBytes(fileAsBytes);
+    }
 
     await _audioPlayer.openPlayer();
     await _audioPlayer.startPlayer(
-        fromURI: maleTTSAudioFileName,
+        fromURI: _ttsAudioFileName,
+        whenFinished: () {
+          stopPlayback();
+        });
+  }
+
+  void playAudioFromFile(String filePath) async {
+    await _audioPlayer.openPlayer();
+    await _audioPlayer.startPlayer(
+        fromURI: filePath,
         whenFinished: () {
           stopPlayback();
         });
@@ -27,6 +42,10 @@ class AudioPlayer {
   Future stopPlayback() async {
     await _audioPlayer.stopPlayer();
     _disposePlayer();
+  }
+
+  void deleteTTSFile() async {
+    await _audioFile?.delete();
   }
 
   void _disposePlayer() {

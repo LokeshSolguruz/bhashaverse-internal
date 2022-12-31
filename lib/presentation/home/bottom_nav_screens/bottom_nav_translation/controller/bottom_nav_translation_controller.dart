@@ -27,8 +27,9 @@ class BottomNavTranslationController extends GetxController {
   RxBool isLsLoading = false.obs;
   RxString selectedSourceLanguage = ''.obs;
   RxString selectedTargetLanguage = ''.obs;
-  dynamic sourceTTSResponse;
   dynamic targetTTSResponse;
+  bool isLanguageSwapped = false;
+  RxBool isRecordedViaMic = false.obs;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -50,7 +51,7 @@ class BottomNavTranslationController extends GetxController {
     super.onClose();
   }
 
-  void interchangeSourceAndTargetLanguage() {
+  void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
       String tempSourceLanguage = selectedSourceLanguage.value;
       selectedSourceLanguage.value = selectedTargetLanguage.value;
@@ -60,6 +61,7 @@ class BottomNavTranslationController extends GetxController {
         sourceLanTextController.text = targetLangTextController.value.text;
         targetLangTextController.text = tempSourceLangText;
       }
+      isLanguageSwapped = !isLanguageSwapped;
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
@@ -101,9 +103,9 @@ class BottomNavTranslationController extends GetxController {
       isMicStoragePermissionGranted = isPermissionGranted;
     });
     if (isMicStoragePermissionGranted) {
-      sourceLanTextController.clear();
-      targetLangTextController.clear();
-      isTranslateCompleted.value = false;
+      // clear previous recording files and
+      // update state
+      resetAllValues();
       isMicButtonTapped.value = true;
       await _voiceRecorder.startRecordingVoice();
     } else {
@@ -140,6 +142,7 @@ class BottomNavTranslationController extends GetxController {
     response.when(
       success: (data) async {
         sourceLanTextController.text = data['source'];
+        isRecordedViaMic.value = true;
         await translateSourceLanguage();
       },
       failure: (error) {
@@ -185,41 +188,28 @@ class BottomNavTranslationController extends GetxController {
   Future<void> getTTSOutput() async {
     GenderEnum? preferredGender = GenderEnum.values
         .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
-    var ttsPayloadForSourceLang = {};
+    var ttsPayload = {};
 
-    ttsPayloadForSourceLang['input'] = [
+    ttsPayload['input'] = [
       {'source': sourceLanTextController.text}
     ];
 
-    ttsPayloadForSourceLang['modelId'] = _languageModelController
-        .getAvailableTTSModel(getSelectedSourceLangCode());
-    ttsPayloadForSourceLang['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
-    ttsPayloadForSourceLang['input'][0]['source'] =
-        sourceLanTextController.text;
-    ttsPayloadForSourceLang['gender'] =
+    ttsPayload['modelId'] = _languageModelController
+        .getAvailableTTSModel(getSelectedTargetLangCode());
+    ttsPayload['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
+    ttsPayload['input'][0]['source'] = targetLangTextController.text;
+    ttsPayload['gender'] =
         preferredGender == GenderEnum.male ? 'male' : 'female';
 
-    var ttsPayloadForTargetLang = {};
-
-    ttsPayloadForTargetLang.addAll(ttsPayloadForSourceLang);
-    ttsPayloadForTargetLang['modelId'] = _languageModelController
-        .getAvailableTTSModel(getSelectedTargetLangCode());
-
-    ttsPayloadForTargetLang['input'] = [
-      {'source': targetLangTextController.text}
-    ];
-
-    var responseList = await _translationAppAPIClient.sendTTSReqForBothGender(
-        ttsPayloadList: [ttsPayloadForSourceLang, ttsPayloadForTargetLang]);
+    var responseList = await _translationAppAPIClient
+        .sendTTSReqTranslation(ttsPayloadList: [ttsPayload]);
 
     responseList.when(
       success: (data) {
         List<String> ttsResponse = [
           data[0]['output']['audio'][0]['audioContent'] ?? '',
-          data[1]['output']['audio'][0]['audioContent'] ?? ''
         ];
-        sourceTTSResponse = ttsResponse[0];
-        targetTTSResponse = ttsResponse[1];
+        targetTTSResponse = ttsResponse[0];
         isTranslateCompleted.value = true;
         isLsLoading.value = false;
         return ttsResponse;
@@ -233,21 +223,35 @@ class BottomNavTranslationController extends GetxController {
     );
   }
 
-  void playTTSOutput(bool playingForTarget) async {
+  void playTTSOutput(bool isPlayingForTarget) async {
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
       isMicStoragePermissionGranted = isPermissionGranted;
     });
     if (isMicStoragePermissionGranted) {
-      String? ttsOutputBase64String;
-
-      ttsOutputBase64String =
-          playingForTarget ? targetTTSResponse : sourceTTSResponse;
-
-      if (ttsOutputBase64String != null && ttsOutputBase64String.isNotEmpty) {
-        _audioPlayer.playAudioFromBase64(ttsOutputBase64String);
+      if ((isPlayingForTarget && !isLanguageSwapped) ||
+          (isLanguageSwapped && !isPlayingForTarget)) {
+        if (targetTTSResponse != null && targetTTSResponse.isNotEmpty) {
+          _audioPlayer.playAudioFromBase64(targetTTSResponse);
+        } else {
+          showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+        }
       } else {
-        showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+        String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
+        if (recordedAudioFilePath != null && recordedAudioFilePath.isNotEmpty) {
+          _audioPlayer.playAudioFromFile(_voiceRecorder.getAudioFilePath()!);
+        }
       }
     }
+  }
+
+  void resetAllValues() {
+    sourceLanTextController.clear();
+    targetLangTextController.clear();
+    isMicButtonTapped.value = false;
+    isTranslateCompleted.value = false;
+    isLanguageSwapped = false;
+    isRecordedViaMic.value = false;
+    _voiceRecorder.deleteRecordedFile();
+    _audioPlayer.deleteTTSFile();
   }
 }
