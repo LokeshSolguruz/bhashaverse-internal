@@ -68,7 +68,12 @@ class _AppLanguageState extends State<AppLanguage> {
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
-                  child: ListView.builder(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: 8.toHeight,
+                      crossAxisCount: 2,
+                      childAspectRatio: 2,
+                    ),
                     itemCount:
                         _appLanguageController.getAppLanguageList().length,
                     itemBuilder: (context, index) {

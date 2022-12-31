@@ -36,7 +36,7 @@ class CustomBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: AppEdgeInsets.instance.only(top: 12, bottom: 16),
+      padding: AppEdgeInsets.instance.only(top: 12, bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(

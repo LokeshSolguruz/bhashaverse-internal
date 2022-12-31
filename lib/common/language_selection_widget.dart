@@ -43,7 +43,6 @@ class LanguageSelectionWidget extends StatelessWidget {
       child: InkWell(
         onTap: onItemTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FittedBox(
