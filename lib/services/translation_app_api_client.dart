@@ -115,7 +115,7 @@ class TranslationAppAPIClient {
     }
   }
 
-  Future<Result<AppException, dynamic>> sendTTSReqForBothGender(
+  Future<Result<AppException, dynamic>> sendTTSReqTranslation(
       {required List<dynamic> ttsPayloadList}) async {
     try {
       final ttsResponsesList = await Future.wait(ttsPayloadList.map(

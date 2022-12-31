@@ -35,9 +35,16 @@ class VoiceRecorder {
     }
     final bytes = audioWavInputFile?.readAsBytesSync();
     _speechToBase64 = base64Encode(bytes!);
-    await audioWavInputFile?.delete();
     _disposeRecorder();
     return _speechToBase64;
+  }
+
+  String? getAudioFilePath() {
+    return audioWavInputFile?.path;
+  }
+
+  void deleteRecordedFile() async {
+    await audioWavInputFile?.delete();
   }
 
   void _disposeRecorder() {

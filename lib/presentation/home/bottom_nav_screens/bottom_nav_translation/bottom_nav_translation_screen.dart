@@ -78,15 +78,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                 GestureDetector(
                                   onTap: () {
                                     _bottomNavTranslationController
-                                        .sourceLanTextController
-                                        .clear();
-                                    _bottomNavTranslationController
-                                        .targetLangTextController
-                                        .clear();
-                                    _bottomNavTranslationController
-                                        .isMicButtonTapped.value = false;
-                                    _bottomNavTranslationController
-                                        .isTranslateCompleted.value = false;
+                                        .resetAllValues();
                                   },
                                   child: Text(
                                     kReset.tr,
@@ -124,7 +116,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                           SizedBox(height: 6.toHeight),
                           if (_bottomNavTranslationController
                               .isTranslateCompleted.value)
-                            _buildSourceTargetTextActions(false),
+                            _buildSourceTargetTextActions(
+                                false,
+                                (_bottomNavTranslationController
+                                        .isRecordedViaMic.value ||
+                                    _bottomNavTranslationController
+                                        .isLanguageSwapped)),
                           SizedBox(height: 6.toHeight),
                           Expanded(
                             child: Obx(
@@ -169,7 +166,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                     SizedBox(height: 6.toHeight),
                                     if (_bottomNavTranslationController
                                         .isTranslateCompleted.value)
-                                      _buildSourceTargetTextActions(true),
+                                      _buildSourceTargetTextActions(
+                                          true,
+                                          (!_bottomNavTranslationController
+                                                  .isLanguageSwapped ||
+                                              (_bottomNavTranslationController
+                                                      .isRecordedViaMic.value &&
+                                                  _bottomNavTranslationController
+                                                      .isLanguageSwapped))),
                                   ],
                                 ),
                               ),
@@ -291,8 +295,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
         ),
         GestureDetector(
           onTap: () {
-            _bottomNavTranslationController
-                .interchangeSourceAndTargetLanguage();
+            _bottomNavTranslationController.swapSourceAndTargetLanguage();
           },
           child: SvgPicture.asset(
             iconArrowSwapHorizontal,
@@ -383,7 +386,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
     );
   }
 
-  Widget _buildSourceTargetTextActions(bool isForTargetSection) {
+  Widget _buildSourceTargetTextActions(
+      bool isForTargetSection, bool showSoundButton) {
     return Row(
       children: [
         SvgPicture.asset(
@@ -400,21 +404,24 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           color: brightGrey,
         ),
         const Spacer(),
-        InkWell(
-          onTap: () {
-            _bottomNavTranslationController.playTTSOutput(isForTargetSection);
-          },
-          child: Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: flushOrangeColor,
-            ),
-            padding: AppEdgeInsets.instance.all(8),
-            child: SvgPicture.asset(
-              iconSound,
-              height: 24.toWidth,
-              width: 24.toWidth,
-              color: balticSea,
+        Visibility(
+          visible: showSoundButton,
+          child: InkWell(
+            onTap: () {
+              _bottomNavTranslationController.playTTSOutput(isForTargetSection);
+            },
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: flushOrangeColor,
+              ),
+              padding: AppEdgeInsets.instance.all(8),
+              child: SvgPicture.asset(
+                iconSound,
+                height: 24.toWidth,
+                width: 24.toWidth,
+                color: balticSea,
+              ),
             ),
           ),
         ),
