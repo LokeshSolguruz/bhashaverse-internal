@@ -21,21 +21,18 @@ class LanguageSelectionScreen extends StatefulWidget {
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
-  late LanguageSelectionController _translateFromController;
+  late LanguageSelectionController _languageSelectionController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
-  List<dynamic> languagesList = [];
+  bool isUserSelectedFromSearchResult = false;
 
   @override
   void initState() {
-    _translateFromController = Get.find();
+    _languageSelectionController = Get.find();
     _languageSearchController = TextEditingController();
     ScreenUtil().init();
     super.initState();
-    var langFromArgument = Get.arguments;
-    if (langFromArgument != null && langFromArgument.isNotEmpty) {
-      languagesList = langFromArgument;
-    }
+    setLanguageListFromArgument();
   }
 
   @override
@@ -55,32 +52,48 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 8.toHeight,
-                      crossAxisCount: 2,
-                      childAspectRatio: 2,
+                  child: Obx(
+                    () => GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisSpacing: 8.toHeight,
+                        crossAxisCount: 2,
+                        childAspectRatio: 2,
+                      ),
+                      itemCount:
+                          _languageSelectionController.getLanguageList().length,
+                      itemBuilder: (context, index) {
+                        return Obx(
+                          () {
+                            return LanguageSelectionWidget(
+                              title: _languageSelectionController
+                                  .getLanguageList()[index],
+                              subTitle: getNativeNameOfLanguage(
+                                  _languageSelectionController
+                                      .getLanguageList()[index]),
+                              onItemTap: () async {
+                                if (isUserSelectedFromSearchResult) {
+                                  String selectedLanguageName =
+                                      _languageSelectionController
+                                          .getLanguageList()[index];
+                                  List<dynamic> originalLanguageList =
+                                      Get.arguments;
+
+                                  Get.back(
+                                      result: originalLanguageList.indexWhere(
+                                          (element) =>
+                                              element == selectedLanguageName));
+                                } else {
+                                  Get.back(result: index);
+                                }
+                              },
+                              index: index,
+                              selectedIndex: _languageSelectionController
+                                  .getSelectedLanguageIndex(),
+                            );
+                          },
+                        );
+                      },
                     ),
-                    itemCount: languagesList.length,
-                    itemBuilder: (context, index) {
-                      return Obx(
-                        () {
-                          return LanguageSelectionWidget(
-                            title: languagesList[index],
-                            subTitle: APIConstants.getLanguageCodeOrName(
-                                value: languagesList[index],
-                                returnWhat: LanguageMap.englishName,
-                                lang_code_map: APIConstants.LANGUAGE_CODE_MAP),
-                            onItemTap: () async {
-                              Get.back(result: index);
-                            },
-                            index: index,
-                            selectedIndex: _translateFromController
-                                .getSelectedLanguageIndex(),
-                          );
-                        },
-                      );
-                    },
                   ),
                 ),
               ),
@@ -115,6 +128,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               .light16BalticSea
               .copyWith(fontSize: 18.toFont, color: manateeGray),
         ),
+        onChanged: (value) {
+          performLanguageSearch(value);
+        },
         controller: _languageSearchController,
         focusNode: _focusNodeLanguageSearch,
       ),
@@ -145,5 +161,39 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         ),
       ],
     );
+  }
+
+  void performLanguageSearch(String searchString) {
+    if (searchString.isNotEmpty) {
+      isUserSelectedFromSearchResult = true;
+      List<dynamic> tempList = _languageSelectionController.getLanguageList();
+      List<dynamic> searchedLanguageList = tempList.where(
+        (language) {
+          return language.toLowerCase().contains(searchString.toLowerCase()) ||
+              getNativeNameOfLanguage(language)
+                  .toLowerCase()
+                  .contains(searchString.toLowerCase());
+        },
+      ).toList();
+      // _appLanguageController.setCustomLanguageList(searchedLanguageList);
+      _languageSelectionController.setLanguageList(searchedLanguageList);
+    } else {
+      setLanguageListFromArgument();
+      isUserSelectedFromSearchResult = false;
+    }
+  }
+
+  void setLanguageListFromArgument() {
+    var langFromArgument = Get.arguments;
+    if (langFromArgument != null && langFromArgument.isNotEmpty) {
+      _languageSelectionController.setLanguageList(langFromArgument);
+    }
+  }
+
+  String getNativeNameOfLanguage(String languageName) {
+    return APIConstants.getLanguageCodeOrName(
+        value: languageName,
+        returnWhat: LanguageMap.englishName,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 }
