@@ -1,9 +1,13 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../animation/lottie_animation.dart';
 import '../widgets/custom_bottom_bar.dart';
+import '../../../utils/constants/app_constants.dart';
 import '../../../utils/theme/app_colors.dart';
-import 'controller/home_controller.dart';
+import '../../home/home_screen/controller/home_controller.dart';
+import '../bottom_nav_screens/bottom_nav_translation/controller/bottom_nav_translation_controller.dart';
 import '../bottom_nav_screens/bottom_nav_settings/bottom_nav_settings.dart';
 import '../bottom_nav_screens/bottom_nav_translation/bottom_nav_translation_screen.dart';
 
@@ -16,10 +20,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeController _homeController;
+  late BottomNavTranslationController _bottomNavTranslationController;
 
   @override
   void initState() {
     _homeController = Get.find();
+    _bottomNavTranslationController = Get.find();
     super.initState();
     _homeController.calcAvailableSourceAndTargetLanguages();
   }
@@ -31,22 +37,34 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Obx(
-          () =>
-
-              // TODO: use proper laoding widget
-              _homeController.isModelsLoading.value
-                  ? const Center(child: CircularProgressIndicator())
-                  : getCurrentBottomWidget(
-                      _homeController.bottomBarIndex.value),
+          () => Stack(
+            clipBehavior: Clip.none,
+            children: [
+              getCurrentBottomWidget(_homeController.bottomBarIndex.value),
+              if (_homeController.isModelsLoading.value ||
+                  _bottomNavTranslationController.isLsLoading.value)
+                LottieAnimation(
+                    context: context,
+                    lottieAsset: _homeController.isModelsLoading.value
+                        ? animationHomeLoading
+                        : animationTranslationLoading,
+                    footerText: _homeController.isModelsLoading.value
+                        ? AppStrings.kHomeLoadingAnimationText
+                        : AppStrings.kTranslationLoadingAnimationText),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Obx(
-        () => CustomBottomBar(
-          currentIndex: _homeController.bottomBarIndex.value,
-          onChanged: (int index) {
-            _homeController.bottomBarIndex.value = index;
-          },
-        ),
+        () => _homeController.isModelsLoading.value ||
+                _bottomNavTranslationController.isLsLoading.value
+            ? const SizedBox.shrink()
+            : CustomBottomBar(
+                currentIndex: _homeController.bottomBarIndex.value,
+                onChanged: (int index) {
+                  _homeController.bottomBarIndex.value = index;
+                },
+              ),
       ),
     );
   }

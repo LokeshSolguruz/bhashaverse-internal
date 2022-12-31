@@ -63,6 +63,8 @@ class AppStrings {
   static const String kTranslation = 'Translation';
   static const String kChat = 'Chat';
   static const String kSettings = 'Settings';
+  static const String kHomeLoadingAnimationText =
+      'Hold up, we are setting up things for you...';
 
   //Bottom Nav - Translation
   static const kTranslateSourceTitle = 'Translate from';
@@ -80,6 +82,7 @@ class AppStrings {
   static const errorInRecording = 'Error voice recording';
   static const noVoiceAssistantAvailable =
       'No voice assistant available for following language';
+  static const kTranslationLoadingAnimationText = 'Translating please wait...';
 }
 
 //common
@@ -137,3 +140,7 @@ const iconClipBoardText = 'assets/images/common_icon/icon_clipboard_text.svg';
 const iconCopy = 'assets/images/common_icon/icon_copy.svg';
 const iconShare = 'assets/images/common_icon/icon_share.svg';
 const iconSound = 'assets/images/common_icon/icon_sound.svg';
+const animationHomeLoading =
+    'assets/images/lottie_animation/animation_home_loading.json';
+const animationTranslationLoading =
+    'assets/images/lottie_animation/animation_translation_loading.json';
