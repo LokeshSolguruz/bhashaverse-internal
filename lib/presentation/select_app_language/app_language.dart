@@ -1,11 +1,14 @@
 import 'package:bhashaverse/utils/constants/api_constants.dart';
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../common/elevated_button.dart';
 import '../../common/language_selection_widget.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
+import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_colors.dart';
@@ -23,11 +26,13 @@ class _AppLanguageState extends State<AppLanguage> {
   late AppLanguageController _appLanguageController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
+  late final Box _hiveDBInstance;
 
   @override
   void initState() {
     _appLanguageController = Get.put(AppLanguageController());
     _languageSearchController = TextEditingController();
+    _hiveDBInstance = Hive.box(hiveDBName);
     ScreenUtil().init();
     super.initState();
   }
@@ -114,16 +119,25 @@ class _AppLanguageState extends State<AppLanguage> {
                     _focusNodeLanguageSearch.unfocus();
                   }
                   _languageSearchController.clear();
-                  Future.delayed(const Duration(milliseconds: 200)).then((_) {
-                    String selectedLocale =
-                        _appLanguageController.getAppLanguageList()[
-                            _appLanguageController.getSelectedLanguageIndex() ??
-                                0][APIConstants.kLanguageCode];
-                    _appLanguageController.setSelectedAppLocale(
-                        selectedLocale == 'hi' ? selectedLocale : 'en');
-
-                    Get.toNamed(AppRoutes.onboardingRoute);
-                  });
+                  if (_appLanguageController.getSelectedLanguageIndex() !=
+                      null) {
+                    Future.delayed(const Duration(milliseconds: 200)).then((_) {
+                      String selectedLocale = _appLanguageController
+                              .getAppLanguageList()[
+                          _appLanguageController.getSelectedLanguageIndex() ??
+                              0][APIConstants.kLanguageCode];
+                      _appLanguageController.setSelectedAppLocale(
+                          selectedLocale == 'hi' ? selectedLocale : 'en');
+                      if (_hiveDBInstance.get(introShownAlreadyKey,
+                          defaultValue: false)) {
+                        Get.back();
+                      } else {
+                        Get.toNamed(AppRoutes.onboardingRoute);
+                      }
+                    });
+                  } else {
+                    showDefaultSnackbar(message: errorPleaseSelectLanguage.tr);
+                  }
                 },
               ),
               SizedBox(height: 16.toHeight),
