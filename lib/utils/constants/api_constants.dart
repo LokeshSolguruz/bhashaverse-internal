@@ -57,71 +57,39 @@ class APIConstants {
     TYPES_OF_MODELS_LIST[2]: 'AI4Bharat,',
   };
 
-  static const kDevanagariName = 'devanagari_name';
+  static const kNativeName = 'native_name';
   static const kEnglishName = 'english_name';
   static const kLanguageCode = 'language_code';
   static const kLanguageCodeList = 'language_code_list';
 
   static final LANGUAGE_CODE_MAP = {
     kLanguageCodeList: [
-      {kDevanagariName: 'اردو', kLanguageCode: 'ur', kEnglishName: 'Urdu'},
-      {kDevanagariName: 'ଓଡିଆ', kLanguageCode: 'or', kEnglishName: 'Oriya'},
-      {kDevanagariName: 'தமிழ்', kLanguageCode: 'ta', kEnglishName: 'Tamil'},
-      {kDevanagariName: 'हिन्दी', kLanguageCode: 'hi', kEnglishName: 'Hindi'},
-      {kDevanagariName: 'डोगरी', kLanguageCode: 'doi', kEnglishName: 'Dogri'},
-      {kDevanagariName: 'తెలుగు', kLanguageCode: 'te', kEnglishName: 'Telugu'},
-      {kDevanagariName: 'नेपाली', kLanguageCode: 'ne', kEnglishName: 'Nepali'},
+      {kNativeName: 'English', kLanguageCode: 'en', kEnglishName: 'English'},
+      {kNativeName: 'हिन्दी', kLanguageCode: 'hi', kEnglishName: 'Hindi'},
+      {kNativeName: 'मराठी', kLanguageCode: 'mr', kEnglishName: 'Marathi'},
+      {kNativeName: 'বাংলা', kLanguageCode: 'bn', kEnglishName: 'Bangla'},
+      {kNativeName: 'ਪੰਜਾਬੀ', kLanguageCode: 'pa', kEnglishName: 'Punjabi'},
+      {kNativeName: 'ગુજરાતી', kLanguageCode: 'gu', kEnglishName: 'Gujarati'},
+      {kNativeName: 'ଓଡିଆ', kLanguageCode: 'or', kEnglishName: 'Oriya'},
+      {kNativeName: 'தமிழ்', kLanguageCode: 'ta', kEnglishName: 'Tamil'},
+      {kNativeName: 'తెలుగు', kLanguageCode: 'te', kEnglishName: 'Telugu'},
+      {kNativeName: 'ಕನ್ನಡ', kLanguageCode: 'kn', kEnglishName: 'Kannada'},
+      {kNativeName: 'اردو', kLanguageCode: 'ur', kEnglishName: 'Urdu'},
+      {kNativeName: 'डोगरी', kLanguageCode: 'doi', kEnglishName: 'Dogri'},
+      {kNativeName: 'नेपाली', kLanguageCode: 'ne', kEnglishName: 'Nepali'},
+      {kNativeName: 'සිංහල', kLanguageCode: 'si', kEnglishName: 'Sinhala'},
+      {kNativeName: 'संस्कृत', kLanguageCode: 'sa', kEnglishName: 'Sanskrit'},
+      {kNativeName: 'অসমীয়া', kLanguageCode: 'as', kEnglishName: 'Assamese'},
+      {kNativeName: 'मैथिली', kLanguageCode: 'mai', kEnglishName: 'Maithili'},
+      {kNativeName: 'भोजपुरी', kLanguageCode: 'bho', kEnglishName: 'Bhojpuri'},
+      {kNativeName: 'മലയാളം', kLanguageCode: 'ml', kEnglishName: 'Malayalam'},
       {
-        kDevanagariName: 'English',
-        kLanguageCode: 'en',
-        kEnglishName: 'English'
-      },
-      {kDevanagariName: 'ਪੰਜਾਬੀ', kLanguageCode: 'pa', kEnglishName: 'Punjabi'},
-      {kDevanagariName: 'සිංහල', kLanguageCode: 'si', kEnglishName: 'Sinhala'},
-      {kDevanagariName: 'मराठी', kLanguageCode: 'mr', kEnglishName: 'Marathi'},
-      {kDevanagariName: 'ಕನ್ನಡ', kLanguageCode: 'kn', kEnglishName: 'Kannada'},
-      {kDevanagariName: 'বাংলা', kLanguageCode: 'bn', kEnglishName: 'Bangla'},
-      {
-        kDevanagariName: 'संस्कृत',
-        kLanguageCode: 'sa',
-        kEnglishName: 'Sanskrit'
-      },
-      {
-        kDevanagariName: 'অসমীয়া',
-        kLanguageCode: 'as',
-        kEnglishName: 'Assamese'
-      },
-      {
-        kDevanagariName: 'ગુજરાતી',
-        kLanguageCode: 'gu',
-        kEnglishName: 'Gujarati'
-      },
-      {
-        kDevanagariName: 'मैथिली',
-        kLanguageCode: 'mai',
-        kEnglishName: 'Maithili'
-      },
-      {
-        kDevanagariName: 'भोजपुरी',
-        kLanguageCode: 'bho',
-        kEnglishName: 'Bhojpuri'
-      },
-      {
-        kDevanagariName: 'മലയാളം',
-        kLanguageCode: 'ml',
-        kEnglishName: 'Malayalam'
-      },
-      {
-        kDevanagariName: 'राजस्थानी',
+        kNativeName: 'राजस्थानी',
         kLanguageCode: 'raj',
         kEnglishName: 'Rajasthani'
       },
-      {kDevanagariName: 'Bodo', kLanguageCode: 'brx', kEnglishName: 'Bodo'},
-      {
-        kDevanagariName: 'মানিপুরি',
-        kLanguageCode: 'mni',
-        kEnglishName: 'Manipuri'
-      },
+      {kNativeName: 'Bodo', kLanguageCode: 'brx', kEnglishName: 'Bodo'},
+      {kNativeName: 'মানিপুরি', kLanguageCode: 'mni', kEnglishName: 'Manipuri'},
     ]
   };
 
@@ -137,19 +105,19 @@ class APIConstants {
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kDevanagariName] ?? 'No Language Name Found';
+          return returningLangPair[kNativeName] ?? 'No Language Name Found';
 
         case LanguageMap.englishName:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
-                  eachLanguageCodeNamePair[kDevanagariName]!.toLowerCase() ==
+                  eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
                   value.toLowerCase());
           return returningLangPair[kEnglishName] ?? 'No Language Name Found';
 
         case LanguageMap.languageCode:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
-                  eachLanguageCodeNamePair[kDevanagariName]!.toLowerCase() ==
+                  eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
                   value.toLowerCase());
           return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
       }

@@ -1,3 +1,4 @@
+import 'package:bhashaverse/utils/constants/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -68,33 +69,35 @@ class _AppLanguageState extends State<AppLanguage> {
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 8.toHeight,
-                      crossAxisCount: 2,
-                      childAspectRatio: 2,
+                  child: Obx(
+                    () => GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisSpacing: 8.toHeight,
+                        crossAxisCount: 2,
+                        childAspectRatio: 2,
+                      ),
+                      itemCount:
+                          _appLanguageController.getAppLanguageList().length,
+                      itemBuilder: (context, index) {
+                        return Obx(
+                          () {
+                            return LanguageSelectionWidget(
+                              title: _appLanguageController
+                                      .getAppLanguageList()[index]
+                                  [APIConstants.kNativeName],
+                              subTitle: _appLanguageController
+                                      .getAppLanguageList()[index]
+                                  [APIConstants.kEnglishName],
+                              onItemTap: () => _appLanguageController
+                                  .setSelectedLanguageIndex(index),
+                              index: index,
+                              selectedIndex: _appLanguageController
+                                  .getSelectedLanguageIndex(),
+                            );
+                          },
+                        );
+                      },
                     ),
-                    itemCount:
-                        _appLanguageController.getAppLanguageList().length,
-                    itemBuilder: (context, index) {
-                      return Obx(
-                        () {
-                          return LanguageSelectionWidget(
-                            title: _appLanguageController
-                                .getAppLanguageList()[index]
-                                .title,
-                            subTitle: _appLanguageController
-                                .getAppLanguageList()[index]
-                                .subTitle,
-                            onItemTap: () => _appLanguageController
-                                .setSelectedLanguageIndex(index),
-                            index: index,
-                            selectedIndex: _appLanguageController
-                                .getSelectedLanguageIndex(),
-                          );
-                        },
-                      );
-                    },
                   ),
                 ),
               ),
@@ -111,6 +114,12 @@ class _AppLanguageState extends State<AppLanguage> {
                     _focusNodeLanguageSearch.unfocus();
                   }
                   _languageSearchController.clear();
+                  String selectedLocale =
+                      _appLanguageController.getAppLanguageList()[
+                          _appLanguageController.getSelectedLanguageIndex() ??
+                              0][APIConstants.kLanguageCode];
+                  _appLanguageController.setSelectedAppLocale(
+                      selectedLocale == 'hi' ? selectedLocale : 'en');
                   Future.delayed(const Duration(milliseconds: 200)).then((_) {
                     Get.toNamed(AppRoutes.onboardingRoute);
                   });
@@ -147,9 +156,30 @@ class _AppLanguageState extends State<AppLanguage> {
               .light16BalticSea
               .copyWith(fontSize: 18.toFont, color: manateeGray),
         ),
+        onChanged: ((value) => performLanguageSearch(value)),
         controller: _languageSearchController,
         focusNode: _focusNodeLanguageSearch,
       ),
     );
+  }
+
+  void performLanguageSearch(String searchString) {
+    List<Map<String, dynamic>> tempList =
+        _appLanguageController.getAppLanguageList();
+    if (searchString.isNotEmpty) {
+      List<Map<String, dynamic>> searchedLanguageList = tempList.where(
+        (language) {
+          return language[APIConstants.kEnglishName]
+                  .toLowerCase()
+                  .contains(searchString.toLowerCase()) ||
+              language[APIConstants.kNativeName]
+                  .toLowerCase()
+                  .contains(searchString.toLowerCase());
+        },
+      ).toList();
+      _appLanguageController.setCustomLanguageList(searchedLanguageList);
+    } else {
+      _appLanguageController.setAllLanguageList();
+    }
   }
 }
