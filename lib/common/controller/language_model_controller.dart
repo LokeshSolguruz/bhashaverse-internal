@@ -28,6 +28,7 @@ class LanguageModelController extends GetxController {
   SearchModel get availableTTSModels => _availableTTSModels;
 
   void calcAvailableSourceAndTargetLanguages(List<dynamic> allModelList) {
+    /// TODO: Handel when perticular model not available
     _availableASRModels = allModelList.firstWhere((eachTaskResponse) {
       return eachTaskResponse['taskType'] == 'asr';
     })['modelInstance'];
@@ -77,11 +78,11 @@ class LanguageModelController extends GetxController {
     for (String eachUseableLangPair in canUseSourceAndTargetLangSet) {
       _allAvailableSourceLanguages.add(APIConstants.getLanguageCodeOrName(
           value: eachUseableLangPair.split('-')[0],
-          returnWhat: LanguageMap.languageName,
+          returnWhat: LanguageMap.devanagariName,
           lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
       _allAvailableTargetLanguages.add(APIConstants.getLanguageCodeOrName(
           value: eachUseableLangPair.split('-')[1],
-          returnWhat: LanguageMap.languageName,
+          returnWhat: LanguageMap.devanagariName,
           lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
     }
   }

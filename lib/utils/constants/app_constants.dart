@@ -1,10 +1,3 @@
-// App Strings
-const appName = 'Bhashaverse';
-
-// Database constants
-const hiveDBName = 'db_bhashaverse';
-const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
-
 class AppStrings {
   //Select App Language Screen
   static const String selectAppLanguage = 'Select App Language';
@@ -79,6 +72,12 @@ class AppStrings {
   static const kTranslate = 'Translate';
   static const kClearAll = 'Clear All';
 }
+
+//common
+const appName = 'Bhashaverse';
+const hiveDBName = 'db_bhashaverse';
+const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
+const errorRetrievingRecordingFile = 'Error Retrieving recording file';
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';

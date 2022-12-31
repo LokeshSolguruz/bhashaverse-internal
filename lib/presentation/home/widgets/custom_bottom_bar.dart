@@ -21,10 +21,12 @@ class CustomBottomBar extends StatelessWidget {
       icon: iconTranslation,
       label: AppStrings.kTranslation,
     ),
-    BottomMenuItemModel(
-      icon: iconChat,
-      label: AppStrings.kChat,
-    ),
+
+    /// TODO: unhide after chat feature added
+    // BottomMenuItemModel(
+    //   icon: iconChat,
+    //   label: AppStrings.kChat,
+    // ),
     BottomMenuItemModel(
       icon: iconSettings,
       label: AppStrings.kSettings,

@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     _homeController = Get.find();
     super.initState();
+    _homeController.calcAvailableSourceAndTargetLanguages();
   }
 
   @override
@@ -31,7 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Obx(
-          () => getCurrentBottomWidget(_homeController.bottomBarIndex.value),
+          () =>
+
+              /// TODO: use proper laoding widget
+              _homeController.isModelsLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : getCurrentBottomWidget(
+                      _homeController.bottomBarIndex.value),
         ),
       ),
       bottomNavigationBar: Obx(

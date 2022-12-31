@@ -1,9 +1,7 @@
 import 'package:bhashaverse/presentation/home/home_screen/binding/home_binding.dart';
 import 'package:bhashaverse/presentation/home/home_screen/home_screen.dart';
-import 'package:bhashaverse/presentation/home/source_language/binding/source_language_binding.dart';
-import 'package:bhashaverse/presentation/home/source_language/source_language_screen.dart';
-import 'package:bhashaverse/presentation/home/target_lanugage/binding/target_language_binding.dart';
-import 'package:bhashaverse/presentation/home/target_lanugage/target_language_screen.dart';
+import 'package:bhashaverse/presentation/home/language_selection/binding/language_selection_binding.dart';
+import 'package:bhashaverse/presentation/home/language_selection/language_selection_screen.dart';
 import 'package:bhashaverse/presentation/onboarding/binding/onboarding_binding.dart';
 import 'package:bhashaverse/presentation/onboarding/onboarding_screen.dart';
 import 'package:bhashaverse/presentation/select_app_language/binding/app_language_binding.dart';
@@ -20,9 +18,7 @@ class AppRoutes {
   static String appLanguageRoute = '/app_language_route';
   static String voiceAssistantRoute = '/voice_assistant_route';
   static String onboardingRoute = '/onboarding_route';
-  static String bottomNavTranslation = '/bottom_nav_translation';
-  static String translateFrom = '/translate_from_route';
-  static String translateTo = '/translate_to_route';
+  static String languageSelectionRoute = '/language_selection_route';
 
   static List<GetPage> pages = [
     GetPage(
@@ -51,14 +47,9 @@ class AppRoutes {
       binding: HomeBinding(),
     ),
     GetPage(
-      name: translateFrom,
-      page: () => const SourceLanguageScreen(),
-      binding: SourceLanguageBinding(),
-    ),
-    GetPage(
-      name: translateTo,
-      page: () => const TargetLanguageScreen(),
-      binding: TargetLanguageBinding(),
+      name: languageSelectionRoute,
+      page: () => const LanguageSelectionScreen(),
+      binding: LanguageSelectionBinding(),
     ),
   ];
 }

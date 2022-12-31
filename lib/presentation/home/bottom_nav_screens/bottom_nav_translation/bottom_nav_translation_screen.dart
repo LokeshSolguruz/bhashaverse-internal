@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/constants/app_constants.dart';
@@ -20,12 +21,14 @@ class BottomNavTranslation extends StatefulWidget {
 
 class _BottomNavTranslationState extends State<BottomNavTranslation> {
   late BottomNavTranslationController _bottomNavTranslationController;
+  late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _transLangFocusNode = FocusNode();
 
   @override
   void initState() {
     _bottomNavTranslationController = Get.find();
+    _languageModelController = Get.find();
     ScreenUtil().init();
     super.initState();
   }
@@ -60,7 +63,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                               children: [
                                 Text(
                                   _bottomNavTranslationController
-                                      .sourceLanguage.value!.title,
+                                      .selectedSourceLanguage.value,
                                   style: AppTextStyle().regular18DolphinGrey,
                                 ),
                                 GestureDetector(
@@ -128,7 +131,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                         alignment: Alignment.topLeft,
                                         child: Text(
                                           _bottomNavTranslationController
-                                              .targetLanguage.value!.title,
+                                              .selectedTargetLanguage.value,
                                           style: AppTextStyle()
                                               .regular18DolphinGrey,
                                         ),
@@ -223,10 +226,29 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         InkWell(
-          onTap: () {
+          onTap: () async {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
-            Get.toNamed(AppRoutes.translateFrom);
+
+            List<dynamic> sourceLanguageList =
+                _languageModelController.allAvailableSourceLanguages.toList();
+
+            if (_bottomNavTranslationController
+                .selectedTargetLanguage.value.isNotEmpty) {
+              sourceLanguageList.removeWhere((eachAvailableSourceLanguage) {
+                return eachAvailableSourceLanguage ==
+                    _bottomNavTranslationController
+                        .selectedTargetLanguage.value;
+              });
+            }
+
+            dynamic selectedSourceLangIndex = await Get.toNamed(
+                AppRoutes.languageSelectionRoute,
+                arguments: sourceLanguageList);
+            if (selectedSourceLangIndex != null) {
+              _bottomNavTranslationController.selectedSourceLanguage.value =
+                  sourceLanguageList[selectedSourceLangIndex];
+            }
           },
           child: Container(
             width: ScreenUtil.screenWidth / 2.8,
@@ -237,16 +259,16 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
-              () => Text(
-                _bottomNavTranslationController.sourceLanguage.value == null
-                    ? AppStrings.kTranslateSourceTitle
-                    : _bottomNavTranslationController
-                        .sourceLanguage.value!.title,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyle()
-                    .regular18DolphinGrey
-                    .copyWith(fontSize: 16.toFont),
-              ),
+              () {
+                return Text(
+                  _bottomNavTranslationController
+                      .getSelectedSourceLanguageName(),
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyle()
+                      .regular18DolphinGrey
+                      .copyWith(fontSize: 16.toFont),
+                );
+              },
             ),
           ),
         ),
@@ -262,10 +284,29 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           ),
         ),
         InkWell(
-          onTap: () {
+          onTap: () async {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
-            Get.toNamed(AppRoutes.translateTo);
+
+            List<dynamic> targetLanguageList =
+                _languageModelController.allAvailableTargetLanguages.toList();
+
+            if (_bottomNavTranslationController
+                .selectedSourceLanguage.value.isNotEmpty) {
+              targetLanguageList.removeWhere((eachAvailableTargetLanguage) {
+                return eachAvailableTargetLanguage ==
+                    _bottomNavTranslationController
+                        .selectedSourceLanguage.value;
+              });
+            }
+
+            dynamic selectedTargetLangIndex = await Get.toNamed(
+                AppRoutes.languageSelectionRoute,
+                arguments: targetLanguageList);
+            if (selectedTargetLangIndex != null) {
+              _bottomNavTranslationController.selectedTargetLanguage.value =
+                  targetLanguageList[selectedTargetLangIndex];
+            }
           },
           child: Container(
             width: ScreenUtil.screenWidth / 2.8,
@@ -277,10 +318,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             ),
             child: Obx(
               () => Text(
-                _bottomNavTranslationController.targetLanguage.value == null
-                    ? AppStrings.kTranslateTargetTitle
-                    : _bottomNavTranslationController
-                        .targetLanguage.value!.title,
+                _bottomNavTranslationController.getSelectedTargetLanguageName(),
                 style: AppTextStyle()
                     .regular18DolphinGrey
                     .copyWith(fontSize: 16.toFont),
