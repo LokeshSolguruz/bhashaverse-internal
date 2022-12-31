@@ -1,10 +1,15 @@
+import 'package:bhashaverse/routes/app_routes.dart';
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../../../enums/gender_enum.dart';
+import '../../../../enums/language_enum.dart';
 import '../../../../localization/localization_keys.dart';
+import '../../../../utils/constants/api_constants.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/theme/app_colors.dart';
@@ -20,12 +25,17 @@ class BottomNavSettings extends StatefulWidget {
 
 class _BottomNavSettingsState extends State<BottomNavSettings> {
   late SettingsController _settingsController;
+  late final Box _hiveDBInstance;
+  String preferredLanguage = '';
 
   @override
   void initState() {
-    super.initState();
     _settingsController = Get.find();
     ScreenUtil().init();
+    _hiveDBInstance = Hive.box(hiveDBName);
+    super.initState();
+    setPreferredLanguage();
+    setPreferredGender();
   }
 
   @override
@@ -53,14 +63,16 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
               ),
               SizedBox(height: 24.toHeight),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.appLanguageRoute)
+                      ?.then((_) => setPreferredLanguage());
+                },
                 borderRadius: BorderRadius.circular(10),
                 child: _containerWidget(
                   widget: Row(
                     children: [
-                      //TODO: remove static
                       Text(
-                        english.tr,
+                        preferredLanguage,
                         style: AppTextStyle()
                             .light16BalticSea
                             .copyWith(color: arsenicColor),
@@ -72,7 +84,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                       ),
                     ],
                   ),
-                  title: english.tr,
+                  title: preferredLanguage,
                   subtitle: appInterfaceWillChangeInSelected.tr,
                 ),
               ),
@@ -87,6 +99,14 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                     trackColor: americanSilver,
                     onChanged: (value) {
                       _settingsController.isTransLiterationOn.value = value;
+                      if (value) {
+                        showDefaultSnackbar(
+                            message: featureAvailableSoonInfo.tr);
+                        Future.delayed(const Duration(seconds: 2))
+                            .then((value) {
+                          _settingsController.isTransLiterationOn.value = false;
+                        });
+                      }
                     },
                   ),
                 ),
@@ -94,12 +114,15 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                 subtitle: transLiterationWillInitiateWord.tr,
               ),
               SizedBox(height: 24.toHeight),
-              InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(10),
-                child: _containerWidget(
-                  widget: SvgPicture.asset(iconArrowDown),
-                  title: advanceSettings.tr,
+              Visibility(
+                visible: false,
+                child: InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(10),
+                  child: _containerWidget(
+                    widget: SvgPicture.asset(iconArrowDown),
+                    title: advanceSettings.tr,
+                  ),
                 ),
               ),
             ],
@@ -191,20 +214,22 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
   }
 
   Widget _radioWidgetBuilder(
-    GenderEnum enumComparisonValue,
+    GenderEnum currentGender,
     String title,
   ) {
     return Obx(
       () => InkWell(
         onTap: () {
-          _settingsController.selectedGender.value = enumComparisonValue;
+          _settingsController.selectedGender.value = currentGender;
+          _hiveDBInstance.put(
+              preferredVoiceAssistantGender, currentGender.name);
+          setPreferredGender();
         },
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
               width: 1.toWidth,
-              color: (_settingsController.selectedGender.value ==
-                      enumComparisonValue)
+              color: (_settingsController.selectedGender.value == currentGender)
                   ? japaneseLaurel
                   : americanSilver,
             ),
@@ -215,8 +240,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
           child: Row(
             children: <Widget>[
               SvgPicture.asset(
-                (_settingsController.selectedGender.value ==
-                        enumComparisonValue)
+                (_settingsController.selectedGender.value == currentGender)
                     ? iconSelectedRadio
                     : iconUnSelectedRadio,
               ),
@@ -226,7 +250,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                 style: AppTextStyle().regular18DolphinGrey.copyWith(
                       fontSize: 16.toFont,
                       color: (_settingsController.selectedGender.value ==
-                              enumComparisonValue)
+                              currentGender)
                           ? japaneseLaurel
                           : dolphinGray,
                     ),
@@ -242,7 +266,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     return Obx(
       () => PopupMenuButton(
         onSelected: (value) {
-          _settingsController.selectedThemeMode.value = value;
+          // _settingsController.selectedThemeMode.value = value;
+          showDefaultSnackbar(message: featureAvailableSoonInfo.tr);
         },
         child: Row(
           children: [
@@ -278,11 +303,23 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     //TODO: set return keys not translatedble
     switch (themeMode) {
       case ThemeMode.system:
-        return systemDefault;
+        return systemDefault.tr;
       case ThemeMode.light:
-        return light;
+        return light.tr;
       case ThemeMode.dark:
-        return dark;
+        return dark.tr;
     }
+  }
+
+  void setPreferredLanguage() {
+    preferredLanguage = APIConstants.getLanguageCodeOrName(
+        value: _hiveDBInstance.get(preferredAppLocale, defaultValue: 'en'),
+        returnWhat: LanguageMap.nativeName,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+  }
+
+  void setPreferredGender() {
+    _settingsController.selectedGender.value = GenderEnum.values
+        .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
   }
 }
