@@ -195,6 +195,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                         right: 24.toWidth,
                         child: CustomOutlineButton(
                           title: AppStrings.kTranslate,
+                          isHighlighted: true,
                           onTap: () {
                             _sourceLangFocusNode.unfocus();
                             _transLangFocusNode.unfocus();

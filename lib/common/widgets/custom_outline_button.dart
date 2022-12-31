@@ -10,12 +10,14 @@ class CustomOutlineButton extends StatelessWidget {
     Key? key,
     this.title,
     this.icon,
+    this.isHighlighted = false,
     required this.onTap,
   }) : super(key: key);
 
   final String? title;
   final String? icon;
   final Function onTap;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +30,9 @@ class CustomOutlineButton extends StatelessWidget {
           Colors.white,
         ),
         side: MaterialStateProperty.resolveWith((state) {
-          if (state.contains(MaterialState.pressed) ||
-              state.contains(MaterialState.focused)) {
-            return const BorderSide(
-              color: japaneseLaurel,
-            );
-          }
+          return BorderSide(
+            color: isHighlighted ? japaneseLaurel : neonGreen,
+          );
         }),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -48,11 +47,14 @@ class CustomOutlineButton extends StatelessWidget {
               height: 20.toWidth,
               width: 20.toWidth,
             ),
-          SizedBox(
-            width: 8.toWidth,
-          ),
+          if (icon != null && icon!.isNotEmpty)
+            SizedBox(
+              width: 8.toWidth,
+            ),
           if (title != null && title!.isNotEmpty)
-            Text(title!, style: AppTextStyle().regular14Arsenic),
+            Text(title!,
+                style: AppTextStyle().regular14Arsenic.copyWith(
+                    color: isHighlighted ? japaneseLaurel : Colors.black87)),
         ],
       ),
     );

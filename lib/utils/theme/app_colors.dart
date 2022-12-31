@@ -7,6 +7,7 @@ const Color dolphinGray = Color(0xFF6A6C75);
 const Color goastWhite = Color(0xFFF2F2F3);
 const Color manateeGray = Color(0xFF9C9DA3);
 const Color sassyGreen = Color(0xFFE7F3E6);
+const Color neonGreen = Color(0xFFB8DBB5);
 const Color japaneseLaurel = Color(0xFF128807);
 const Color americanSilver = Color(0xFFCDCED1);
 const Color arsenicColor = Color(0xFF393B47);
