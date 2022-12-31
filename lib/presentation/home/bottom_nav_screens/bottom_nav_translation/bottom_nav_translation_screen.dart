@@ -109,6 +109,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                               } else {}
                             },
                             maxLines: 6,
+                            readOnly: _bottomNavTranslationController
+                                .isTranslateCompleted.value,
                             decoration: InputDecoration.collapsed(
                                 hintText: _bottomNavTranslationController
                                         .isTranslateCompleted.value
@@ -152,6 +154,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                                 .targetLangTextController,
                                         focusNode: _transLangFocusNode,
                                         maxLines: 6,
+                                        readOnly:
+                                            _bottomNavTranslationController
+                                                .isTranslateCompleted.value,
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                         ),
