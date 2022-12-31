@@ -376,7 +376,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           },
           backgroundColor: flushOrangeColor,
           child: SvgPicture.asset(
-            iconMicroPhone,
+            _bottomNavTranslationController.isMicButtonTapped.value
+                ? iconListening
+                : iconMicroPhone,
           ),
         ),
       ),

@@ -136,6 +136,7 @@ const iconSettings = 'assets/images/bottom_bar_icons/icon_settings.svg';
 const iconArrowSwapHorizontal =
     'assets/images/common_icon/icon_arrow_swap_horizontal.svg';
 const iconMicroPhone = 'assets/images/common_icon/icon_microphone.svg';
+const iconListening = 'assets/images/common_icon/icon_listening.svg';
 const iconClipBoardText = 'assets/images/common_icon/icon_clipboard_text.svg';
 const iconCopy = 'assets/images/common_icon/icon_copy.svg';
 const iconShare = 'assets/images/common_icon/icon_share.svg';
