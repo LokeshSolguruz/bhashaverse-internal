@@ -76,6 +76,7 @@ class AppStrings {
 //common
 const appName = 'Bhashaverse';
 const hiveDBName = 'db_bhashaverse';
+const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
 
 // App Assets
