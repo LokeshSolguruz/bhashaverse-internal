@@ -232,9 +232,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             height: 32.toHeight,
           ),
           _buildMicButton(),
-          SizedBox(
-            height: 10.toHeight,
-          ),
         ],
       ),
     );

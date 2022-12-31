@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Positioned(
                 top: 30.toHeight,
-                bottom: 100.toHeight,
+                bottom: 110.toHeight,
                 left: 0,
                 right: 0,
                 child: getCurrentBottomWidget(
