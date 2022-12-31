@@ -5,7 +5,6 @@ final Map<String, String> en = {
   selectAppLanguage: 'Select App Language',
   youCanAlwaysChange: 'You can always change this from settings.',
   searchLanguage: 'Search language',
-  english: 'English',
   continueText: 'Continue',
   next: 'Next',
   skip: 'Skip',
@@ -60,4 +59,6 @@ final Map<String, String> en = {
   noVoiceAssistantAvailable:
       'No voice assistant available for following language',
   kTranslationLoadingAnimationText: 'Translating please wait...',
+  errorPleaseSelectLanguage: 'Please select language',
+  featureAvailableSoonInfo: 'This feature will be available soon',
 };

@@ -5,7 +5,6 @@ final Map<String, String> hi = {
   selectAppLanguage: 'ऐप्लिकेशन की भाषा चुनें',
   youCanAlwaysChange: 'आप सेटिंग से इसे कभी भी बदल सकते हैं।',
   searchLanguage: 'सर्च भाषा',
-  english: 'अंग्रेज़ी',
   continueText: 'जारी रखें',
   next: 'आगे',
   skip: 'स्किप',
@@ -33,7 +32,7 @@ final Map<String, String> hi = {
   systemDefault: 'सिस्टम डिफ़ॉल्ट',
   appLanguage: 'ऐप भाषा',
   appInterfaceWillChangeInSelected: 'ऐप इंटरफ़ेस चयनित ऐप भाषा में बदल जाएगा।',
-  voiceAssistant: 'आवाज सहायक',
+  voiceAssistant: 'ध्वनि सहायक',
   transLiteration: 'लिप्यंतरण',
   transLiterationWillInitiateWord:
       'लिप्यंतरण आपके टाइप करते समय शब्द सुझाव आरंभ करेगा',
@@ -58,4 +57,6 @@ final Map<String, String> hi = {
       'निम्नलिखित भाषा के लिए कोई आवाज सहायक उपलब्ध नहीं है',
   kTranslationLoadingAnimationText:
       'अनुवाद कर रहे हैं, कृपया प्रतीक्षा करें...',
+  errorPleaseSelectLanguage: 'कृपया भाषा चुनें',
+  featureAvailableSoonInfo: 'यह सुविधा जल्द ही उपलब्ध होगी',
 };

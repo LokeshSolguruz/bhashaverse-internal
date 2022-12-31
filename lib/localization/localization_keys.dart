@@ -2,7 +2,6 @@ const String appName = 'appName';
 const String selectAppLanguage = 'selectAppLanguage';
 const String youCanAlwaysChange = 'youCanAlwaysChange';
 const String searchLanguage = 'searchLanguage';
-const String english = 'english';
 const String continueText = 'continueText';
 
 const String next = 'next';
@@ -59,3 +58,5 @@ const String errorInRecording = 'errorInRecording';
 const String noVoiceAssistantAvailable = 'noVoiceAssistantAvailable';
 const String kTranslationLoadingAnimationText =
     'kTranslationLoadingAnimationText';
+const String errorPleaseSelectLanguage = 'errorPleaseSelectLanguage';
+const String featureAvailableSoonInfo = 'featureAvailableSoonInfo';
