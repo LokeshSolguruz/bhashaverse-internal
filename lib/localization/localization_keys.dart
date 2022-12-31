@@ -60,3 +60,4 @@ const String kTranslationLoadingAnimationText =
     'kTranslationLoadingAnimationText';
 const String errorPleaseSelectLanguage = 'errorPleaseSelectLanguage';
 const String featureAvailableSoonInfo = 'featureAvailableSoonInfo';
+const String errorSelectVoiceAssistant = 'errorSelectVoiceAssistant';

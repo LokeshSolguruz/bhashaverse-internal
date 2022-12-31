@@ -1,3 +1,4 @@
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -81,6 +82,10 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 backgroundColor: primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
+                  if (_voiceAssistantController.getSelectedGender() == null) {
+                    showDefaultSnackbar(message: errorSelectVoiceAssistant.tr);
+                    return;
+                  }
                   Box hiveDBInstance = Hive.box(hiveDBName);
                   hiveDBInstance.put(introShownAlreadyKey, true);
                   Get.offAllNamed(AppRoutes.homeRoute);

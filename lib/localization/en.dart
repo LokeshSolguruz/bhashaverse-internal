@@ -61,4 +61,5 @@ final Map<String, String> en = {
   kTranslationLoadingAnimationText: 'Translating please wait...',
   errorPleaseSelectLanguage: 'Please select language',
   featureAvailableSoonInfo: 'This feature will be available soon',
+  errorSelectVoiceAssistant: 'Please select voice assistant avatar',
 };

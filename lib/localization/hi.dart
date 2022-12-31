@@ -19,12 +19,12 @@ final Map<String, String> hi = {
   translateSentencesFromOneIndianLanguageToAnother:
       'वाक्यों का एक भारतीय भाषा से दूसरी भाषा में अनुवाद करें',
   bhashaverseChatBot: 'भाषावर्स चैट बॉट',
-  selectVoiceAssistant: 'वॉइस असिस्टेंट अवतार चुनें',
+  selectVoiceAssistant: 'ध्वनि सहायक अवतार चुनें',
   youWillHearTheTranslationText:
       'आपके द्वारा चुने गए अवतार की आवाज में आपको अनुवाद सुनाई देगा। आप सेटिंग से कभी भी अवतार बदल सकते हैं।',
   male: 'पुरुष',
   female: 'स्त्री',
-  letsTranslate: 'आइए, अनुवाद करें',
+  letsTranslate: 'अनुवाद शूरू करें',
   appTheme: 'ऐप थीम',
   appInterfaceWillChange: 'एप्लिकेशन इंटरफ़ेस तदनुसार चयनित मोड में बदल जाएगा',
   light: 'लाइट',
@@ -59,4 +59,5 @@ final Map<String, String> hi = {
       'अनुवाद कर रहे हैं, कृपया प्रतीक्षा करें...',
   errorPleaseSelectLanguage: 'कृपया भाषा चुनें',
   featureAvailableSoonInfo: 'यह सुविधा जल्द ही उपलब्ध होगी',
+  errorSelectVoiceAssistant: 'कृपया ध्वनि सहायक अवतार चुनें',
 };
