@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
+import '../../../../../localization/localization_keys.dart';
 import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
@@ -60,8 +61,7 @@ class BottomNavTranslationController extends GetxController {
         targetLangTextController.text = tempSourceLangText;
       }
     } else {
-      showDefaultSnackbar(
-          message: AppStrings.kErrorSelectSourceAndTargetScreen);
+      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
   }
 
@@ -71,7 +71,7 @@ class BottomNavTranslationController extends GetxController {
 
   String getSelectedSourceLanguageName() {
     if (selectedSourceLanguage.value.isEmpty) {
-      return AppStrings.kTranslateSourceTitle;
+      return kTranslateSourceTitle.tr;
     } else {
       return selectedSourceLanguage.value;
     }
@@ -79,7 +79,7 @@ class BottomNavTranslationController extends GetxController {
 
   String getSelectedTargetLanguageName() {
     if (selectedTargetLanguage.value.isEmpty) {
-      return AppStrings.kTranslateTargetTitle;
+      return kTranslateTargetTitle.tr;
     } else {
       return selectedTargetLanguage.value;
     }
@@ -107,7 +107,7 @@ class BottomNavTranslationController extends GetxController {
       isMicButtonTapped.value = true;
       await _voiceRecorder.startRecordingVoice();
     } else {
-      showDefaultSnackbar(message: AppStrings.errorMicStoragePermission);
+      showDefaultSnackbar(message: errorMicStoragePermission.tr);
     }
   }
 
@@ -117,7 +117,7 @@ class BottomNavTranslationController extends GetxController {
         await _voiceRecorder.stopRecordingVoiceAndGetOutput();
     if (base64EncodedAudioContent == null ||
         base64EncodedAudioContent.isEmpty) {
-      showDefaultSnackbar(message: AppStrings.errorInRecording);
+      showDefaultSnackbar(message: errorInRecording.tr);
       return;
     } else {
       await getASROutput(base64EncodedAudioContent);
@@ -246,7 +246,7 @@ class BottomNavTranslationController extends GetxController {
       if (ttsOutputBase64String != null && ttsOutputBase64String.isNotEmpty) {
         _audioPlayer.playAudioFromBase64(ttsOutputBase64String);
       } else {
-        showDefaultSnackbar(message: AppStrings.noVoiceAssistantAvailable);
+        showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
       }
     }
   }

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../localization/localization_keys.dart';
 import '/models/onboarding_model.dart';
 import '/utils/constants/app_constants.dart';
 
@@ -18,23 +19,23 @@ class OnboardingController extends GetxController {
 
     pages.add(OnboardingModel(
       imagePath: imgOnboarding1,
-      headerText: AppStrings.speechRecognition,
-      bodyText: AppStrings.automaticallyRecognizeAndConvert,
+      headerText: speechRecognition.tr,
+      bodyText: automaticallyRecognizeAndConvert.tr,
     ));
     pages.add(OnboardingModel(
       imagePath: imgOnboarding2,
-      headerText: AppStrings.speechToSpeechTranslation,
-      bodyText: AppStrings.translateYourVoiceInOneIndianLanguage,
+      headerText: speechToSpeechTranslation.tr,
+      bodyText: translateYourVoiceInOneIndianLanguage.tr,
     ));
     pages.add(OnboardingModel(
       imagePath: imgOnboarding3,
-      headerText: AppStrings.languageTranslation,
-      bodyText: AppStrings.translateSentencesFromOneIndianLanguageToAnother,
+      headerText: languageTranslation.tr,
+      bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
     ));
     pages.add(OnboardingModel(
       imagePath: imgOnboarding4,
-      headerText: AppStrings.bhashaverseChatBot,
-      bodyText: AppStrings.translateSentencesFromOneIndianLanguageToAnother,
+      headerText: bhashaverseChatBot.tr,
+      bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
     ));
 
     return pages;

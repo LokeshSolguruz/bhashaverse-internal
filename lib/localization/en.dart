@@ -1,6 +1,7 @@
 import 'localization_keys.dart';
 
 final Map<String, String> en = {
+  appName: 'Bhashaverse',
   selectAppLanguage: 'Select App Language',
   youCanAlwaysChange: 'You can always change this from settings.',
   searchLanguage: 'Search language',

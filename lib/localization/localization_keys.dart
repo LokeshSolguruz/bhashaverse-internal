@@ -1,3 +1,4 @@
+const String appName = 'appName';
 const String selectAppLanguage = 'selectAppLanguage';
 const String youCanAlwaysChange = 'youCanAlwaysChange';
 const String searchLanguage = 'searchLanguage';

@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../enums/gender_enum.dart';
+import '../../../../localization/localization_keys.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/theme/app_colors.dart';
@@ -39,7 +40,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
             children: [
               SizedBox(height: 16.toHeight),
               Text(
-                AppStrings.kSettings,
+                kSettings.tr,
                 style: AppTextStyle()
                     .semibold24BalticSea
                     .copyWith(fontSize: 20.toFont),
@@ -47,8 +48,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
               SizedBox(height: 48.toHeight),
               _containerWidget(
                 widget: _popupMenuBuilder(),
-                title: AppStrings.appTheme,
-                subtitle: AppStrings.appInterfaceWillChange,
+                title: appTheme.tr,
+                subtitle: appInterfaceWillChange.tr,
               ),
               SizedBox(height: 24.toHeight),
               InkWell(
@@ -57,8 +58,9 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                 child: _containerWidget(
                   widget: Row(
                     children: [
+                      //TODO: remove static
                       Text(
-                        AppStrings.english,
+                        english.tr,
                         style: AppTextStyle()
                             .light16BalticSea
                             .copyWith(color: arsenicColor),
@@ -70,8 +72,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                       ),
                     ],
                   ),
-                  title: AppStrings.english,
-                  subtitle: AppStrings.appInterfaceWillChangeInSelected,
+                  title: english.tr,
+                  subtitle: appInterfaceWillChangeInSelected.tr,
                 ),
               ),
               SizedBox(height: 24.toHeight),
@@ -88,8 +90,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                     },
                   ),
                 ),
-                title: AppStrings.transLiteration,
-                subtitle: AppStrings.transLiterationWillInitiateWord,
+                title: transLiteration.tr,
+                subtitle: transLiterationWillInitiateWord.tr,
               ),
               SizedBox(height: 24.toHeight),
               InkWell(
@@ -97,7 +99,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                 borderRadius: BorderRadius.circular(10),
                 child: _containerWidget(
                   widget: SvgPicture.asset(iconArrowDown),
-                  title: AppStrings.advanceSettings,
+                  title: advanceSettings.tr,
                 ),
               ),
             ],
@@ -167,7 +169,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
         children: [
           Expanded(
             child: Text(
-              AppStrings.voiceAssistant,
+              voiceAssistant.tr,
               style: AppTextStyle().regular18DolphinGrey.copyWith(
                     fontSize: 20.toFont,
                     color: balticSea,
@@ -176,12 +178,12 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
           ),
           _radioWidgetBuilder(
             GenderEnum.male,
-            AppStrings.male,
+            male.tr,
           ),
           SizedBox(width: 8.toWidth),
           _radioWidgetBuilder(
             GenderEnum.female,
-            AppStrings.female,
+            female.tr,
           ),
         ],
       ),
@@ -254,17 +256,17 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
           ],
         ),
         itemBuilder: (context) => [
-          const PopupMenuItem(
+          PopupMenuItem(
             value: ThemeMode.light,
-            child: Text(AppStrings.light),
+            child: Text((light.tr)),
           ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: ThemeMode.dark,
-            child: Text(AppStrings.dark),
+            child: Text(dark.tr),
           ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: ThemeMode.system,
-            child: Text(AppStrings.systemDefault),
+            child: Text(systemDefault.tr),
           ),
         ],
       ),
@@ -273,13 +275,14 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
 
   /// Get ThemeMode in string of given ThemeMode
   String _getThemeModeName(ThemeMode themeMode) {
+    //TODO: set return keys not translatedble
     switch (themeMode) {
       case ThemeMode.system:
-        return AppStrings.systemDefault;
+        return systemDefault;
       case ThemeMode.light:
-        return AppStrings.light;
+        return light;
       case ThemeMode.dark:
-        return AppStrings.dark;
+        return dark;
     }
   }
 }

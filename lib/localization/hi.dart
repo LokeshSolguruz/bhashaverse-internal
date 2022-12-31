@@ -1,6 +1,7 @@
 import 'localization_keys.dart';
 
 final Map<String, String> hi = {
+  appName: 'भाषावर्स',
   selectAppLanguage: 'ऐप्लिकेशन की भाषा चुनें',
   youCanAlwaysChange: 'आप सेटिंग से इसे कभी भी बदल सकते हैं।',
   searchLanguage: 'सर्च भाषा',

@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 
 import '../../common/elevated_button.dart';
 import '../../common/language_selection_widget.dart';
+import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
-import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_colors.dart';
@@ -53,12 +53,12 @@ class _AppLanguageState extends State<AppLanguage> {
             children: [
               SizedBox(height: 16.toHeight),
               Text(
-                AppStrings.selectAppLanguage,
+                selectAppLanguage.tr,
                 style: AppTextStyle().semibold24BalticSea,
               ),
               SizedBox(height: 8.toHeight),
               Text(
-                AppStrings.youCanAlwaysChange,
+                youCanAlwaysChange.tr,
                 style: AppTextStyle()
                     .light16BalticSea
                     .copyWith(color: dolphinGray),
@@ -103,7 +103,7 @@ class _AppLanguageState extends State<AppLanguage> {
               ),
               SizedBox(height: 16.toHeight),
               elevatedButton(
-                buttonText: AppStrings.continueText,
+                buttonText: continueText.tr,
                 textStyle: AppTextStyle()
                     .semibold24BalticSea
                     .copyWith(fontSize: 18.toFont),
@@ -151,7 +151,7 @@ class _AppLanguageState extends State<AppLanguage> {
             Icons.search,
             color: dolphinGray,
           ),
-          hintText: AppStrings.searchLanguage,
+          hintText: searchLanguage.tr,
           hintStyle: AppTextStyle()
               .light16BalticSea
               .copyWith(fontSize: 18.toFont, color: manateeGray),

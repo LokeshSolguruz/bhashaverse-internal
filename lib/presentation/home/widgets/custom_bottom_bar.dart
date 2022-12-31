@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
+import '../../../localization/localization_keys.dart';
 import '../../../models/bottom_menu_item_model.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/screen_util/screen_util.dart';
@@ -19,17 +21,17 @@ class CustomBottomBar extends StatelessWidget {
   final List<BottomMenuItemModel> bottomMenuList = [
     BottomMenuItemModel(
       icon: iconTranslation,
-      label: AppStrings.kTranslation,
+      label: kTranslation.tr,
     ),
 
     // TODO: uncomment after chat feature added
     // BottomMenuItemModel(
     //   icon: iconChat,
-    //   label: AppStrings.kChat,
+    //   label:kChat.tr,
     // ),
     BottomMenuItemModel(
       icon: iconSettings,
-      label: AppStrings.kSettings,
+      label: kSettings.tr,
     ),
   ];
 

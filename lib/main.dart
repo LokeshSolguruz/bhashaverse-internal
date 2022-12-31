@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import 'localization/app_localization.dart';
+import 'localization/localization_keys.dart';
 import 'presentation/splash_screen/binding/splash_binding.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants/app_constants.dart';
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
       appLocale = 'en';
     }
     return GetMaterialApp(
-      title: appName,
+      title: appName.tr,
       debugShowCheckedModeBanner: false,
       translations: AppLocalization(),
       locale: Locale(appLocale),
