@@ -55,21 +55,26 @@ class CustomBottomBar extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         items: List.generate(bottomMenuList.length, (index) {
           return BottomNavigationBarItem(
-              icon: SvgPicture.asset(
+            icon: Padding(
+              padding:
+                  AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
+              child: SvgPicture.asset(
                 bottomMenuList[index].icon,
               ),
-              label: bottomMenuList[index].label,
-              activeIcon: Container(
-                padding: AppEdgeInsets.instance
-                    .symmetric(horizontal: 20, vertical: 8),
-                decoration: const BoxDecoration(
-                  color: approxKarry,
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-                child: SvgPicture.asset(
-                  bottomMenuList[index].icon,
-                ),
-              ));
+            ),
+            label: bottomMenuList[index].label,
+            activeIcon: Container(
+              padding:
+                  AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
+              decoration: const BoxDecoration(
+                color: approxKarry,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              child: SvgPicture.asset(
+                bottomMenuList[index].icon,
+              ),
+            ),
+          );
         }),
         onTap: (index) {
           onChanged(index);
