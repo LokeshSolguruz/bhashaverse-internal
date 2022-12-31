@@ -88,7 +88,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                         .isTranslateCompleted.value = false;
                                   },
                                   child: Text(
-                                    AppStrings.kClearAll,
+                                    AppStrings.kReset,
                                     style: AppTextStyle()
                                         .regular18DolphinGrey
                                         .copyWith(color: japaneseLaurel),

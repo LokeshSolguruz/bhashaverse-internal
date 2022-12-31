@@ -73,7 +73,7 @@ class AppStrings {
   static const kListeningHintText = 'Listening, Speak now...';
   static const kPaste = 'Paste';
   static const kTranslate = 'Translate';
-  static const kClearAll = 'Clear All';
+  static const kReset = 'Reset';
   static const kErrorNoSourceText = 'Please enter text first';
   static const kErrorSelectSourceAndTargetScreen =
       'Please select source and target language first';
