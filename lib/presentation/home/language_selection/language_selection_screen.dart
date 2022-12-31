@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../common/language_selection_widget.dart';
 import '../../../enums/language_enum.dart';
+import '../../../localization/localization_keys.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/remove_glow_effect.dart';
@@ -109,7 +110,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             Icons.search,
             color: dolphinGray,
           ),
-          hintText: AppStrings.searchLanguage,
+          hintText: searchLanguage.tr,
           hintStyle: AppTextStyle()
               .light16BalticSea
               .copyWith(fontSize: 18.toFont, color: manateeGray),
@@ -139,7 +140,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         ),
         SizedBox(width: 24.toWidth),
         Text(
-          AppStrings.kTranslateSourceTitle,
+          kTranslateSourceTitle.tr,
           style: AppTextStyle().semibold24BalticSea,
         ),
       ],

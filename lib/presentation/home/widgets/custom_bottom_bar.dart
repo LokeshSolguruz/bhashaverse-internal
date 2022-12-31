@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
+import '../../../localization/localization_keys.dart';
 import '../../../models/bottom_menu_item_model.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/screen_util/screen_util.dart';
@@ -19,17 +21,17 @@ class CustomBottomBar extends StatelessWidget {
   final List<BottomMenuItemModel> bottomMenuList = [
     BottomMenuItemModel(
       icon: iconTranslation,
-      label: AppStrings.kTranslation,
+      label: kTranslation.tr,
     ),
 
     // TODO: uncomment after chat feature added
     // BottomMenuItemModel(
     //   icon: iconChat,
-    //   label: AppStrings.kChat,
+    //   label:kChat.tr,
     // ),
     BottomMenuItemModel(
       icon: iconSettings,
-      label: AppStrings.kSettings,
+      label: kSettings.tr,
     ),
   ];
 
@@ -53,21 +55,26 @@ class CustomBottomBar extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         items: List.generate(bottomMenuList.length, (index) {
           return BottomNavigationBarItem(
-              icon: SvgPicture.asset(
+            icon: Padding(
+              padding:
+                  AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
+              child: SvgPicture.asset(
                 bottomMenuList[index].icon,
               ),
-              label: bottomMenuList[index].label,
-              activeIcon: Container(
-                padding: AppEdgeInsets.instance
-                    .symmetric(horizontal: 20, vertical: 8),
-                decoration: const BoxDecoration(
-                  color: approxKarry,
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-                child: SvgPicture.asset(
-                  bottomMenuList[index].icon,
-                ),
-              ));
+            ),
+            label: bottomMenuList[index].label,
+            activeIcon: Container(
+              padding:
+                  AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
+              decoration: const BoxDecoration(
+                color: approxKarry,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              child: SvgPicture.asset(
+                bottomMenuList[index].icon,
+              ),
+            ),
+          );
         }),
         onTap: (index) {
           onChanged(index);

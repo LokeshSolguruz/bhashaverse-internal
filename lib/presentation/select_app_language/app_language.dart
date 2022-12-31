@@ -1,8 +1,12 @@
+import 'package:bhashaverse/utils/constants/api_constants.dart';
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../common/elevated_button.dart';
 import '../../common/language_selection_widget.dart';
+import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
@@ -22,11 +26,13 @@ class _AppLanguageState extends State<AppLanguage> {
   late AppLanguageController _appLanguageController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
+  late final Box _hiveDBInstance;
 
   @override
   void initState() {
     _appLanguageController = Get.put(AppLanguageController());
     _languageSearchController = TextEditingController();
+    _hiveDBInstance = Hive.box(hiveDBName);
     ScreenUtil().init();
     super.initState();
   }
@@ -52,12 +58,12 @@ class _AppLanguageState extends State<AppLanguage> {
             children: [
               SizedBox(height: 16.toHeight),
               Text(
-                AppStrings.selectAppLanguage,
+                selectAppLanguage.tr,
                 style: AppTextStyle().semibold24BalticSea,
               ),
               SizedBox(height: 8.toHeight),
               Text(
-                AppStrings.youCanAlwaysChange,
+                youCanAlwaysChange.tr,
                 style: AppTextStyle()
                     .light16BalticSea
                     .copyWith(color: dolphinGray),
@@ -68,39 +74,41 @@ class _AppLanguageState extends State<AppLanguage> {
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 8.toHeight,
-                      crossAxisCount: 2,
-                      childAspectRatio: 2,
+                  child: Obx(
+                    () => GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisSpacing: 8.toHeight,
+                        crossAxisCount: 2,
+                        childAspectRatio: 2,
+                      ),
+                      itemCount:
+                          _appLanguageController.getAppLanguageList().length,
+                      itemBuilder: (context, index) {
+                        return Obx(
+                          () {
+                            return LanguageSelectionWidget(
+                              title: _appLanguageController
+                                      .getAppLanguageList()[index]
+                                  [APIConstants.kNativeName],
+                              subTitle: _appLanguageController
+                                      .getAppLanguageList()[index]
+                                  [APIConstants.kEnglishName],
+                              onItemTap: () => _appLanguageController
+                                  .setSelectedLanguageIndex(index),
+                              index: index,
+                              selectedIndex: _appLanguageController
+                                  .getSelectedLanguageIndex(),
+                            );
+                          },
+                        );
+                      },
                     ),
-                    itemCount:
-                        _appLanguageController.getAppLanguageList().length,
-                    itemBuilder: (context, index) {
-                      return Obx(
-                        () {
-                          return LanguageSelectionWidget(
-                            title: _appLanguageController
-                                .getAppLanguageList()[index]
-                                .title,
-                            subTitle: _appLanguageController
-                                .getAppLanguageList()[index]
-                                .subTitle,
-                            onItemTap: () => _appLanguageController
-                                .setSelectedLanguageIndex(index),
-                            index: index,
-                            selectedIndex: _appLanguageController
-                                .getSelectedLanguageIndex(),
-                          );
-                        },
-                      );
-                    },
                   ),
                 ),
               ),
               SizedBox(height: 16.toHeight),
               elevatedButton(
-                buttonText: AppStrings.continueText,
+                buttonText: continueText.tr,
                 textStyle: AppTextStyle()
                     .semibold24BalticSea
                     .copyWith(fontSize: 18.toFont),
@@ -111,9 +119,25 @@ class _AppLanguageState extends State<AppLanguage> {
                     _focusNodeLanguageSearch.unfocus();
                   }
                   _languageSearchController.clear();
-                  Future.delayed(const Duration(milliseconds: 200)).then((_) {
-                    Get.toNamed(AppRoutes.onboardingRoute);
-                  });
+                  if (_appLanguageController.getSelectedLanguageIndex() !=
+                      null) {
+                    Future.delayed(const Duration(milliseconds: 200)).then((_) {
+                      String selectedLocale = _appLanguageController
+                              .getAppLanguageList()[
+                          _appLanguageController.getSelectedLanguageIndex() ??
+                              0][APIConstants.kLanguageCode];
+                      _appLanguageController.setSelectedAppLocale(
+                          selectedLocale == 'hi' ? selectedLocale : 'en');
+                      if (_hiveDBInstance.get(introShownAlreadyKey,
+                          defaultValue: false)) {
+                        Get.back();
+                      } else {
+                        Get.toNamed(AppRoutes.onboardingRoute);
+                      }
+                    });
+                  } else {
+                    showDefaultSnackbar(message: errorPleaseSelectLanguage.tr);
+                  }
                 },
               ),
               SizedBox(height: 16.toHeight),
@@ -142,14 +166,35 @@ class _AppLanguageState extends State<AppLanguage> {
             Icons.search,
             color: dolphinGray,
           ),
-          hintText: AppStrings.searchLanguage,
+          hintText: searchLanguage.tr,
           hintStyle: AppTextStyle()
               .light16BalticSea
               .copyWith(fontSize: 18.toFont, color: manateeGray),
         ),
+        onChanged: ((value) => performLanguageSearch(value)),
         controller: _languageSearchController,
         focusNode: _focusNodeLanguageSearch,
       ),
     );
+  }
+
+  void performLanguageSearch(String searchString) {
+    List<Map<String, dynamic>> tempList =
+        _appLanguageController.getAppLanguageList();
+    if (searchString.isNotEmpty) {
+      List<Map<String, dynamic>> searchedLanguageList = tempList.where(
+        (language) {
+          return language[APIConstants.kEnglishName]
+                  .toLowerCase()
+                  .contains(searchString.toLowerCase()) ||
+              language[APIConstants.kNativeName]
+                  .toLowerCase()
+                  .contains(searchString.toLowerCase());
+        },
+      ).toList();
+      _appLanguageController.setCustomLanguageList(searchedLanguageList);
+    } else {
+      _appLanguageController.setAllLanguageList();
+    }
   }
 }

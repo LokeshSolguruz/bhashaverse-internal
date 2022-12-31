@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../animation/lottie_animation.dart';
+import '../../../localization/localization_keys.dart';
 import '../widgets/custom_bottom_bar.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/theme/app_colors.dart';
@@ -66,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? animationHomeLoading
                       : animationTranslationLoading,
                   footerText: _homeController.isModelsLoading.value
-                      ? AppStrings.kHomeLoadingAnimationText
-                      : AppStrings.kTranslationLoadingAnimationText),
+                      ? kHomeLoadingAnimationText.tr
+                      : kTranslationLoadingAnimationText.tr),
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
+import '../../../../localization/localization_keys.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
@@ -44,7 +45,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             height: 16.toHeight,
           ),
           Text(
-            appName,
+            appName.tr,
             style: AppTextStyle().semibold22BalticSea,
           ),
           SizedBox(
@@ -88,7 +89,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                         .isTranslateCompleted.value = false;
                                   },
                                   child: Text(
-                                    AppStrings.kReset,
+                                    kReset.tr,
                                     style: AppTextStyle()
                                         .regular18DolphinGrey
                                         .copyWith(color: japaneseLaurel),
@@ -117,8 +118,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                     ? ''
                                     : _bottomNavTranslationController
                                             .isMicButtonTapped.value
-                                        ? AppStrings.kListeningHintText
-                                        : AppStrings.kTranslationHintText),
+                                        ? kListeningHintText.tr
+                                        : kTranslationHintText.tr),
                           ),
                           SizedBox(height: 6.toHeight),
                           if (_bottomNavTranslationController
@@ -185,7 +186,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                         left: 24.toWidth,
                         child: CustomOutlineButton(
                           icon: iconClipBoardText,
-                          title: AppStrings.kPaste,
+                          title: kPaste.tr,
                           onTap: () {},
                         ),
                       ),
@@ -197,7 +198,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                         bottom: 24.toHeight,
                         right: 24.toWidth,
                         child: CustomOutlineButton(
-                          title: AppStrings.kTranslate,
+                          title: kTranslate.tr,
                           isHighlighted: true,
                           onTap: () {
                             _sourceLangFocusNode.unfocus();
@@ -205,15 +206,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                             if (_bottomNavTranslationController
                                 .sourceLanTextController.text.isEmpty) {
                               showDefaultSnackbar(
-                                  message: AppStrings.kErrorNoSourceText);
+                                  message: kErrorNoSourceText.tr);
                             } else if (_bottomNavTranslationController
                                 .isSourceAndTargetLangSelected()) {
                               _bottomNavTranslationController
                                   .translateSourceLanguage();
                             } else {
                               showDefaultSnackbar(
-                                  message: AppStrings
-                                      .kErrorSelectSourceAndTargetScreen);
+                                  message:
+                                      kErrorSelectSourceAndTargetScreen.tr);
                             }
                           },
                         ),
@@ -368,7 +369,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               }
             } else {
               showDefaultSnackbar(
-                  message: AppStrings.kErrorSelectSourceAndTargetScreen);
+                  message: kErrorSelectSourceAndTargetScreen.tr);
             }
           },
           backgroundColor: flushOrangeColor,

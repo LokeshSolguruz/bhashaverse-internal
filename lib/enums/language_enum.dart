@@ -1,5 +1,5 @@
 enum LanguageMap {
-  devanagariName,
+  nativeName,
   englishName,
   languageCode,
 }

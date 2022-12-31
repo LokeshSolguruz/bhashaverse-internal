@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../common/elevated_button.dart';
+import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
@@ -67,8 +68,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
                               1)
-                      ? AppStrings.getStarted
-                      : AppStrings.next,
+                      ? getStarted.tr
+                      : next.tr,
                   textStyle: AppTextStyle()
                       .semibold24BalticSea
                       .copyWith(fontSize: 18.toFont),
@@ -125,7 +126,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           child: InkWell(
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
-              AppStrings.skip,
+              skip.tr,
               style: AppTextStyle().light16BalticSea.copyWith(
                     color: japaneseLaurel,
                   ),

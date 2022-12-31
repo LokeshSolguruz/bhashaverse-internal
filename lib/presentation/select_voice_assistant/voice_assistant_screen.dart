@@ -1,9 +1,11 @@
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 import '../../common/elevated_button.dart';
 import '../../enums/gender_enum.dart';
+import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
@@ -45,12 +47,12 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
             children: [
               SizedBox(height: 16.toHeight),
               Text(
-                AppStrings.selectVoiceAssistant,
+                selectVoiceAssistant.tr,
                 style: AppTextStyle().semibold24BalticSea,
               ),
               SizedBox(height: 8.toHeight),
               Text(
-                AppStrings.youWillHearTheTranslationText,
+                youWillHearTheTranslationText.tr,
                 style: AppTextStyle()
                     .light16BalticSea
                     .copyWith(color: dolphinGray),
@@ -61,25 +63,33 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                   _avatarWidgetBuilder(
                     GenderEnum.male,
                     imgMaleAvatar,
-                    AppStrings.male,
+                    male.tr,
                   ),
                   SizedBox(width: 10.toWidth),
                   _avatarWidgetBuilder(
                     GenderEnum.female,
                     imgFemaleAvatar,
-                    AppStrings.female,
+                    female.tr,
                   ),
                 ],
               ),
               const Spacer(),
               elevatedButton(
-                buttonText: AppStrings.letsTranslate,
+                buttonText: letsTranslate.tr,
                 textStyle: AppTextStyle()
                     .semibold24BalticSea
                     .copyWith(fontSize: 18.toFont),
                 backgroundColor: primaryColor,
                 borderRadius: 16,
-                onButtonTap: () => Get.offAllNamed(AppRoutes.homeRoute),
+                onButtonTap: () {
+                  if (_voiceAssistantController.getSelectedGender() == null) {
+                    showDefaultSnackbar(message: errorSelectVoiceAssistant.tr);
+                    return;
+                  }
+                  Box hiveDBInstance = Hive.box(hiveDBName);
+                  hiveDBInstance.put(introShownAlreadyKey, true);
+                  Get.offAllNamed(AppRoutes.homeRoute);
+                },
               ),
               SizedBox(height: 36.toHeight),
             ],

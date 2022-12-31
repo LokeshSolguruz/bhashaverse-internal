@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
@@ -16,14 +17,21 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   late SplashController _splashController;
+  late final Box _hiveDBInstance;
+  bool isIntroShownAlready = false;
 
   @override
   void initState() {
     _splashController = Get.find();
+    _hiveDBInstance = Hive.box(hiveDBName);
+    isIntroShownAlready =
+        _hiveDBInstance.get(introShownAlreadyKey, defaultValue: false);
     super.initState();
     ScreenUtil().init();
     Future.delayed(const Duration(seconds: 3)).then((value) {
-      Get.offNamed(AppRoutes.appLanguageRoute);
+      Get.offNamed(isIntroShownAlready
+          ? AppRoutes.homeRoute
+          : AppRoutes.appLanguageRoute);
     });
   }
 
