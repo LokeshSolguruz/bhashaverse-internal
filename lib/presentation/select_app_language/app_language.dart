@@ -114,13 +114,14 @@ class _AppLanguageState extends State<AppLanguage> {
                     _focusNodeLanguageSearch.unfocus();
                   }
                   _languageSearchController.clear();
-                  String selectedLocale =
-                      _appLanguageController.getAppLanguageList()[
-                          _appLanguageController.getSelectedLanguageIndex() ??
-                              0][APIConstants.kLanguageCode];
-                  _appLanguageController.setSelectedAppLocale(
-                      selectedLocale == 'hi' ? selectedLocale : 'en');
                   Future.delayed(const Duration(milliseconds: 200)).then((_) {
+                    String selectedLocale =
+                        _appLanguageController.getAppLanguageList()[
+                            _appLanguageController.getSelectedLanguageIndex() ??
+                                0][APIConstants.kLanguageCode];
+                    _appLanguageController.setSelectedAppLocale(
+                        selectedLocale == 'hi' ? selectedLocale : 'en');
+
                     Get.toNamed(AppRoutes.onboardingRoute);
                   });
                 },

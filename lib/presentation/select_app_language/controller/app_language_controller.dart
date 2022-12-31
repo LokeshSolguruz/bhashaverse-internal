@@ -14,8 +14,8 @@ class AppLanguageController extends GetxController {
 
   @override
   void onInit() {
-    super.onInit();
     _hiveDBInstance = Hive.box(hiveDBName);
+    super.onInit();
     _setAllLanguageList();
   }
 
