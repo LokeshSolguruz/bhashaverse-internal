@@ -34,10 +34,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Box hiveDBInstance = Hive.box(hiveDBName);
-    String? appLocale = hiveDBInstance.get(preferredAppLocale);
-    if (appLocale == null || appLocale.isEmpty) {
-      hiveDBInstance.put(preferredAppLocale, 'en');
-      appLocale = 'en';
+    String appLocale =
+        hiveDBInstance.get(preferredAppLocale, defaultValue: 'en');
+    if (appLocale.isEmpty) {
+      hiveDBInstance.put(preferredAppLocale, appLocale);
     }
     return GetMaterialApp(
       title: appName.tr,

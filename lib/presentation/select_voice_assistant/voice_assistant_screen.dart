@@ -80,7 +80,11 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                     .copyWith(fontSize: 18.toFont),
                 backgroundColor: primaryColor,
                 borderRadius: 16,
-                onButtonTap: () => Get.offAllNamed(AppRoutes.homeRoute),
+                onButtonTap: () {
+                  Box hiveDBInstance = Hive.box(hiveDBName);
+                  hiveDBInstance.put(introShownAlreadyKey, true);
+                  Get.offAllNamed(AppRoutes.homeRoute);
+                },
               ),
               SizedBox(height: 36.toHeight),
             ],

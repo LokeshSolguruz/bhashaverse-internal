@@ -2,6 +2,7 @@
 const hiveDBName = 'db_bhashaverse';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const preferredAppLocale = 'preferred_app_locale';
+const introShownAlreadyKey = 'is_intro_shown_already';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
 const defaultAudioRecordingName = 'ASRAudio.wav';
 const defaultTTSPlayName = 'TTSAudio.wav';
