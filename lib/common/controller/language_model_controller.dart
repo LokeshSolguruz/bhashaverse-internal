@@ -79,11 +79,11 @@ class LanguageModelController extends GetxController {
     for (String eachUseableLangPair in canUseSourceAndTargetLangSet) {
       _allAvailableSourceLanguages.add(APIConstants.getLanguageCodeOrName(
           value: eachUseableLangPair.split('-')[0],
-          returnWhat: LanguageMap.devanagariName,
+          returnWhat: LanguageMap.nativeName,
           lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
       _allAvailableTargetLanguages.add(APIConstants.getLanguageCodeOrName(
           value: eachUseableLangPair.split('-')[1],
-          returnWhat: LanguageMap.devanagariName,
+          returnWhat: LanguageMap.nativeName,
           lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
     }
   }

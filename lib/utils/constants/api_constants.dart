@@ -100,7 +100,7 @@ class APIConstants {
     // If Language Code is to be returned that means the value received is a language name
     try {
       switch (returnWhat) {
-        case LanguageMap.devanagariName:
+        case LanguageMap.nativeName:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
