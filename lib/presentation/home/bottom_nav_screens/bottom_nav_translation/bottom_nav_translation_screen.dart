@@ -160,6 +160,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                                 .isTranslateCompleted.value,
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.zero,
                                         ),
                                       ),
                                     ),
