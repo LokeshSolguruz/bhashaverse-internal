@@ -75,7 +75,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                 Text(
                                   _bottomNavTranslationController
                                       .selectedSourceLanguage.value,
-                                  style: AppTextStyle().regular18DolphinGrey,
+                                  style: AppTextStyle().regular16DolphinGrey,
                                 ),
                                 GestureDetector(
                                   onTap: () {
@@ -106,6 +106,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                             maxLines: 6,
                             readOnly: _bottomNavTranslationController
                                 .isTranslateCompleted.value,
+                            style: AppTextStyle().regular18balticSea,
                             decoration: InputDecoration.collapsed(
                                 hintText: _bottomNavTranslationController
                                         .isTranslateCompleted.value
@@ -144,7 +145,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                           _bottomNavTranslationController
                                               .selectedTargetLanguage.value,
                                           style: AppTextStyle()
-                                              .regular18DolphinGrey,
+                                              .regular16DolphinGrey,
                                         ),
                                       ),
                                     SizedBox(
@@ -157,6 +158,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                                 .targetLangTextController,
                                         focusNode: _transLangFocusNode,
                                         maxLines: 6,
+                                        style:
+                                            AppTextStyle().regular18balticSea,
                                         readOnly:
                                             _bottomNavTranslationController
                                                 .isTranslateCompleted.value,
@@ -198,10 +201,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                           onTap: () async {
                             ClipboardData? clipboardData =
                                 await Clipboard.getData(Clipboard.kTextPlain);
-                            if (clipboardData != null) {
+                            if (clipboardData != null &&
+                                (clipboardData.text ?? '').isNotEmpty) {
                               _bottomNavTranslationController
                                   .sourceLanTextController
                                   .text = clipboardData.text ?? '';
+                            } else {
+                              showDefaultSnackbar(
+                                  message: errorNoTextInClipboard.tr);
                             }
                           },
                         ),
@@ -275,9 +282,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               });
             }
 
-            dynamic selectedSourceLangIndex = await Get.toNamed(
-                AppRoutes.languageSelectionRoute,
-                arguments: sourceLanguageList);
+            dynamic selectedSourceLangIndex =
+                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
+              kLanguageList: sourceLanguageList,
+              kIsSourceLanguage: false
+            });
             if (selectedSourceLangIndex != null) {
               _bottomNavTranslationController.selectedSourceLanguage.value =
                   sourceLanguageList[selectedSourceLangIndex];
@@ -332,9 +341,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               });
             }
 
-            dynamic selectedTargetLangIndex = await Get.toNamed(
-                AppRoutes.languageSelectionRoute,
-                arguments: targetLanguageList);
+            dynamic selectedTargetLangIndex =
+                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
+              kLanguageList: targetLanguageList,
+              kIsSourceLanguage: false
+            });
             if (selectedTargetLangIndex != null) {
               _bottomNavTranslationController.selectedTargetLanguage.value =
                   targetLanguageList[selectedTargetLangIndex];
@@ -438,7 +449,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                   _bottomNavTranslationController.sourceLanTextController.text;
             }
             if (copyText.isEmpty) {
-              showDefaultSnackbar(message: noTextForShare.tr);
+              showDefaultSnackbar(message: noTextForCopy.tr);
               return;
             } else {
               await Clipboard.setData(ClipboardData(text: copyText));
