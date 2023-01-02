@@ -39,25 +39,22 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       body: Obx(
         () => Stack(
-          // clipBehavior: Clip.none,
           children: [
-            Positioned(
-                top: 30.toHeight,
-                bottom: 110.toHeight,
-                left: 0,
-                right: 0,
-                child: getCurrentBottomWidget(
-                    _homeController.bottomBarIndex.value)),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: CustomBottomBar(
-                currentIndex: _homeController.bottomBarIndex.value,
-                onChanged: (int index) {
-                  _homeController.bottomBarIndex.value = index;
-                },
-              ),
+            Column(
+              children: [
+                SizedBox(
+                  height: 40.toHeight,
+                ),
+                Expanded(
+                    child: getCurrentBottomWidget(
+                        _homeController.bottomBarIndex.value)),
+                CustomBottomBar(
+                  currentIndex: _homeController.bottomBarIndex.value,
+                  onChanged: (int index) {
+                    _homeController.bottomBarIndex.value = index;
+                  },
+                ),
+              ],
             ),
             if (_homeController.isModelsLoading.value ||
                 _bottomNavTranslationController.isLsLoading.value)
