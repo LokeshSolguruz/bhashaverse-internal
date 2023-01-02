@@ -61,3 +61,6 @@ const String kTranslationLoadingAnimationText =
 const String errorPleaseSelectLanguage = 'errorPleaseSelectLanguage';
 const String featureAvailableSoonInfo = 'featureAvailableSoonInfo';
 const String errorSelectVoiceAssistant = 'errorSelectVoiceAssistant';
+const String femaleVoiceAssistantNotAvailable =
+    'femaleVoiceAssistantNotAvailable';
+const String maleVoiceAssistantNotAvailable = 'maleVoiceAssistantNotAvailable';

@@ -46,7 +46,9 @@ class AudioPlayer {
   }
 
   void deleteTTSFile() async {
-    await _audioFile?.delete();
+    if (_audioFile != null && await _audioFile!.exists()) {
+      await _audioFile?.delete();
+    }
   }
 
   void _disposePlayer() {

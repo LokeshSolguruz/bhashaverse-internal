@@ -61,4 +61,8 @@ final Map<String, String> en = {
   errorPleaseSelectLanguage: 'Please select language',
   featureAvailableSoonInfo: 'This feature will be available soon',
   errorSelectVoiceAssistant: 'Please select voice assistant avatar',
+  femaleVoiceAssistantNotAvailable:
+      'Female Voice assistant is not available, Playing from male voice assistant',
+  maleVoiceAssistantNotAvailable:
+      'Male Voice assistant is not available, Playing from female voice assistant',
 };

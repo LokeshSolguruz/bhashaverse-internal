@@ -27,7 +27,8 @@ class BottomNavTranslationController extends GetxController {
   RxBool isLsLoading = false.obs;
   RxString selectedSourceLanguage = ''.obs;
   RxString selectedTargetLanguage = ''.obs;
-  dynamic targetTTSResponse;
+  dynamic targetTTSResponseForMale;
+  dynamic targetTTSResponseForFemale;
   bool isLanguageSwapped = false;
   RxBool isRecordedViaMic = false.obs;
 
@@ -186,33 +187,40 @@ class BottomNavTranslationController extends GetxController {
   }
 
   Future<void> getTTSOutput() async {
-    GenderEnum? preferredGender = GenderEnum.values
-        .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
-    var ttsPayload = {};
+    var ttsPayloadForMale = {};
 
-    ttsPayload['input'] = [
-      {'source': sourceLanTextController.text}
+    ttsPayloadForMale['input'] = [
+      {'source': targetLangTextController.text}
     ];
 
-    ttsPayload['modelId'] = _languageModelController
+    ttsPayloadForMale['modelId'] = _languageModelController
         .getAvailableTTSModel(getSelectedTargetLangCode());
-    ttsPayload['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
-    ttsPayload['input'][0]['source'] = targetLangTextController.text;
-    ttsPayload['gender'] =
-        preferredGender == GenderEnum.male ? 'male' : 'female';
+    ttsPayloadForMale['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
+    ttsPayloadForMale['gender'] = 'male';
 
-    var responseList = await _translationAppAPIClient
-        .sendTTSReqTranslation(ttsPayloadList: [ttsPayload]);
+    var ttsPayloadForFemale = {};
+    ttsPayloadForFemale.addAll(ttsPayloadForMale);
+    ttsPayloadForFemale['gender'] = 'female';
+
+    var responseList = await _translationAppAPIClient.sendTTSReqTranslation(
+        ttsPayloadList: [ttsPayloadForMale, ttsPayloadForFemale]);
 
     responseList.when(
       success: (data) {
-        List<String> ttsResponse = [
-          data[0]['output']['audio'][0]['audioContent'] ?? '',
-        ];
-        targetTTSResponse = ttsResponse[0];
+        if (data != null && data.isNotEmpty) {
+          for (var genderResponse in data) {
+            if (genderResponse['gender'] == 'male') {
+              targetTTSResponseForMale =
+                  data[0]['output']['audio'][0]['audioContent'] ?? '';
+            } else {
+              targetTTSResponseForFemale =
+                  data[0]['output']['audio'][0]['audioContent'] ?? '';
+            }
+          }
+        }
+
         isTranslateCompleted.value = true;
         isLsLoading.value = false;
-        return ttsResponse;
       },
       failure: (error) {
         showDefaultSnackbar(
@@ -230,8 +238,30 @@ class BottomNavTranslationController extends GetxController {
     if (isMicPermissionGranted) {
       if ((isPlayingForTarget && !isLanguageSwapped) ||
           (isLanguageSwapped && !isPlayingForTarget)) {
-        if (targetTTSResponse != null && targetTTSResponse.isNotEmpty) {
-          _audioPlayer.playAudioFromBase64(targetTTSResponse);
+        GenderEnum? preferredGender = GenderEnum.values
+            .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
+
+        bool isMaleTTSAvailable = targetTTSResponseForMale != null &&
+            targetTTSResponseForMale.isNotEmpty;
+
+        bool isFemaleTTSAvailable = targetTTSResponseForFemale != null &&
+            targetTTSResponseForFemale.isNotEmpty;
+
+        _audioPlayer.deleteTTSFile();
+
+        if ((preferredGender == GenderEnum.male && isMaleTTSAvailable) ||
+            (!isFemaleTTSAvailable && isMaleTTSAvailable)) {
+          if (preferredGender == GenderEnum.female) {
+            showDefaultSnackbar(message: femaleVoiceAssistantNotAvailable.tr);
+          }
+          _audioPlayer.playAudioFromBase64(targetTTSResponseForMale);
+        } else if ((preferredGender == GenderEnum.female &&
+                isFemaleTTSAvailable) ||
+            (!isMaleTTSAvailable && isFemaleTTSAvailable)) {
+          if (preferredGender == GenderEnum.male) {
+            showDefaultSnackbar(message: maleVoiceAssistantNotAvailable.tr);
+          }
+          _audioPlayer.playAudioFromBase64(targetTTSResponseForFemale);
         } else {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
         }
@@ -253,5 +283,7 @@ class BottomNavTranslationController extends GetxController {
     isRecordedViaMic.value = false;
     _voiceRecorder.deleteRecordedFile();
     _audioPlayer.deleteTTSFile();
+    targetTTSResponseForMale = null;
+    targetTTSResponseForFemale = null;
   }
 }

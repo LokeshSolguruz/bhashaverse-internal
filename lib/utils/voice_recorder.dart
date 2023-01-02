@@ -45,7 +45,9 @@ class VoiceRecorder {
   }
 
   void deleteRecordedFile() async {
-    await audioWavInputFile?.delete();
+    if (audioWavInputFile != null && await audioWavInputFile!.exists()) {
+      await audioWavInputFile?.delete();
+    }
   }
 
   void _disposeRecorder() {
