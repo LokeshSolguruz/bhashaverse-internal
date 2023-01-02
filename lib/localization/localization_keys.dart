@@ -61,6 +61,9 @@ const String kTranslationLoadingAnimationText =
 const String errorPleaseSelectLanguage = 'errorPleaseSelectLanguage';
 const String featureAvailableSoonInfo = 'featureAvailableSoonInfo';
 const String errorSelectVoiceAssistant = 'errorSelectVoiceAssistant';
+const String noTextForShare = 'noTextForShare';
+const String noTextForCopy = 'noTextForCopy';
+const String textCopiedToClipboard = 'textCopiedToClipboard';
 const String femaleVoiceAssistantNotAvailable =
     'femaleVoiceAssistantNotAvailable';
 const String maleVoiceAssistantNotAvailable = 'maleVoiceAssistantNotAvailable';

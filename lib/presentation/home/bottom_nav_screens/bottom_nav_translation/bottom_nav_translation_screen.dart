@@ -1,8 +1,10 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
@@ -193,7 +195,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                         child: CustomOutlineButton(
                           icon: iconClipBoardText,
                           title: kPaste.tr,
-                          onTap: () {},
+                          onTap: () async {
+                            ClipboardData? clipboardData =
+                                await Clipboard.getData(Clipboard.kTextPlain);
+                            if (clipboardData != null) {
+                              _bottomNavTranslationController
+                                  .sourceLanTextController
+                                  .text = clipboardData.text ?? '';
+                            }
+                          },
                         ),
                       ),
                     ),
@@ -392,18 +402,55 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
       bool isForTargetSection, bool showSoundButton) {
     return Row(
       children: [
-        SvgPicture.asset(
-          iconShare,
-          height: 24.toWidth,
-          width: 24.toWidth,
-          color: brightGrey,
+        InkWell(
+          onTap: () {
+            String shareText = '';
+            if (isForTargetSection) {
+              shareText =
+                  _bottomNavTranslationController.targetLangTextController.text;
+            } else {
+              shareText =
+                  _bottomNavTranslationController.sourceLanTextController.text;
+            }
+            if (shareText.isEmpty) {
+              showDefaultSnackbar(message: noTextForShare.tr);
+              return;
+            } else {
+              Share.share(shareText);
+            }
+          },
+          child: SvgPicture.asset(
+            iconShare,
+            height: 24.toWidth,
+            width: 24.toWidth,
+            color: brightGrey,
+          ),
         ),
         SizedBox(width: 24.toWidth),
-        SvgPicture.asset(
-          iconCopy,
-          height: 24.toWidth,
-          width: 24.toWidth,
-          color: brightGrey,
+        InkWell(
+          onTap: () async {
+            String copyText = '';
+            if (isForTargetSection) {
+              copyText =
+                  _bottomNavTranslationController.targetLangTextController.text;
+            } else {
+              copyText =
+                  _bottomNavTranslationController.sourceLanTextController.text;
+            }
+            if (copyText.isEmpty) {
+              showDefaultSnackbar(message: noTextForShare.tr);
+              return;
+            } else {
+              await Clipboard.setData(ClipboardData(text: copyText));
+              showDefaultSnackbar(message: textCopiedToClipboard.tr);
+            }
+          },
+          child: SvgPicture.asset(
+            iconCopy,
+            height: 24.toWidth,
+            width: 24.toWidth,
+            color: brightGrey,
+          ),
         ),
         const Spacer(),
         Visibility(
