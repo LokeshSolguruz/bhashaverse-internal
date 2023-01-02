@@ -52,8 +52,7 @@ final Map<String, String> hi = {
   kErrorSelectSourceAndTargetScreen: 'कृपया पहले भाषा चुनें',
   errorMicPermission: 'साउंड रिकॉर्ड करने के लिए माइक अनुमति चाहिए',
   errorInRecording: 'वॉयस रिकॉर्डिंग में त्रुटि',
-  noVoiceAssistantAvailable:
-      'निम्नलिखित भाषा के लिए कोई आवाज सहायक उपलब्ध नहीं है',
+  noVoiceAssistantAvailable: 'इस समय कोई ध्वनि सहायक उपलब्ध नहीं है',
   kTranslationLoadingAnimationText:
       'अनुवाद कर रहे हैं, कृपया प्रतीक्षा करें...',
   errorPleaseSelectLanguage: 'कृपया भाषा चुनें',
@@ -66,4 +65,5 @@ final Map<String, String> hi = {
       'स्त्री वॉयस असिस्टेंट उपलब्ध नहीं है, पुरुष वॉयस असिस्टेंट से ध्वनि चल रही है',
   maleVoiceAssistantNotAvailable:
       'पुरुष वॉइस असिस्टेंट उपलब्ध नहीं है, स्त्री वॉइस असिस्टेंट से ध्वनि चल रही है',
+  errorNoTextInClipboard: 'क्लिपबोर्ड में कोई टेक्स्ट उपलब्ध नहीं है',
 };

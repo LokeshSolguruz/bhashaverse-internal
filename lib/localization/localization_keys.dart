@@ -67,3 +67,4 @@ const String textCopiedToClipboard = 'textCopiedToClipboard';
 const String femaleVoiceAssistantNotAvailable =
     'femaleVoiceAssistantNotAvailable';
 const String maleVoiceAssistantNotAvailable = 'maleVoiceAssistantNotAvailable';
+const String errorNoTextInClipboard = 'errorNoTextInClipboard';
