@@ -84,7 +84,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                       ),
                     ],
                   ),
-                  title: preferredLanguage,
+                  title: appLanguage.tr,
                   subtitle: appInterfaceWillChangeInSelected.tr,
                 ),
               ),
