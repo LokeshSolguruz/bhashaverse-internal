@@ -59,4 +59,8 @@ final Map<String, String> hi = {
   errorPleaseSelectLanguage: 'कृपया भाषा चुनें',
   featureAvailableSoonInfo: 'यह सुविधा जल्द ही उपलब्ध होगी',
   errorSelectVoiceAssistant: 'कृपया ध्वनि सहायक अवतार चुनें',
+  femaleVoiceAssistantNotAvailable:
+      'स्त्री वॉयस असिस्टेंट उपलब्ध नहीं है, पुरुष वॉयस असिस्टेंट से ध्वनि चल रही है',
+  maleVoiceAssistantNotAvailable:
+      'पुरुष वॉइस असिस्टेंट उपलब्ध नहीं है, स्त्री वॉइस असिस्टेंट से ध्वनि चल रही है',
 };

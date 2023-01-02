@@ -118,13 +118,18 @@ class TranslationAppAPIClient {
   Future<Result<AppException, dynamic>> sendTTSReqTranslation(
       {required List<dynamic> ttsPayloadList}) async {
     try {
-      final ttsResponsesList = await Future.wait(ttsPayloadList.map(
-          (eachTaskPayload) => _dio.post(APIConstants.TTS_REQ_URL,
-              data: eachTaskPayload,
-              options: Options(headers: {
-                'Content-Type': 'application/json',
-                'Accept': '*/*'
-              }))));
+      final ttsResponsesList = await Future.wait(
+        ttsPayloadList.map(
+          (eachTaskPayload) => _dio.post(
+            APIConstants.TTS_REQ_URL,
+            data: eachTaskPayload,
+            options: Options(
+              headers: {'Content-Type': 'application/json', 'Accept': '*/*'},
+              validateStatus: (status) => true,
+            ),
+          ),
+        ),
+      );
 
       List<Map<String, dynamic>> ttsOutputResponsesList = [];
 
