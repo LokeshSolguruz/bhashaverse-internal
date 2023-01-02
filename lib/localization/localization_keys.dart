@@ -53,7 +53,7 @@ const String kReset = 'kReset';
 const String kErrorNoSourceText = 'kErrorNoSourceText';
 const String kErrorSelectSourceAndTargetScreen =
     'kErrorSelectSourceAndTargetScreen';
-const String errorMicStoragePermission = 'errorMicStoragePermission';
+const String errorMicPermission = 'errorMicPermission';
 const String errorInRecording = 'errorInRecording';
 const String noVoiceAssistantAvailable = 'noVoiceAssistantAvailable';
 const String kTranslationLoadingAnimationText =

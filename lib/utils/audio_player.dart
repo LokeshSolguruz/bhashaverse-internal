@@ -15,7 +15,7 @@ class AudioPlayer {
 
   void playAudioFromBase64(String base64Text) async {
     var fileAsBytes = base64Decode(base64Text);
-    appDocDir = await getExternalStorageDirectory();
+    appDocDir = await getApplicationDocumentsDirectory();
     _ttsAudioFileName = '${appDocDir!.path}/$defaultTTSPlayName';
     _audioFile = File(_ttsAudioFileName);
     if (_audioFile != null && !await _audioFile!.exists()) {

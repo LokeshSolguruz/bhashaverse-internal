@@ -16,7 +16,7 @@ class VoiceRecorder {
 
   Future<void> startRecordingVoice() async {
     await _audioRec.openRecorder();
-    Directory? appDocDir = await getExternalStorageDirectory();
+    Directory? appDocDir = await getApplicationDocumentsDirectory();
     appDocPath = appDocDir!.path;
     await _audioRec.startRecorder(
       toFile: '$appDocPath/$recordedAudioFileName',

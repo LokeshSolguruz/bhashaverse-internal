@@ -50,8 +50,7 @@ final Map<String, String> hi = {
   kReset: 'रीसेट',
   kErrorNoSourceText: 'कृपया पहले वाक्य दर्ज करें',
   kErrorSelectSourceAndTargetScreen: 'कृपया पहले भाषा चुनें',
-  errorMicStoragePermission:
-      'साउंड रिकॉर्ड करने के लिए माइक और स्टोरेज की अनुमति चाहिए',
+  errorMicPermission: 'साउंड रिकॉर्ड करने के लिए माइक अनुमति चाहिए',
   errorInRecording: 'वॉयस रिकॉर्डिंग में त्रुटि',
   noVoiceAssistantAvailable:
       'निम्नलिखित भाषा के लिए कोई आवाज सहायक उपलब्ध नहीं है',

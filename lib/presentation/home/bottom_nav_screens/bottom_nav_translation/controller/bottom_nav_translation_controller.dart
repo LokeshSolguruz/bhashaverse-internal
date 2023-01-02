@@ -23,7 +23,7 @@ class BottomNavTranslationController extends GetxController {
 
   RxBool isTranslateCompleted = false.obs;
   RxBool isMicButtonTapped = false.obs;
-  bool isMicStoragePermissionGranted = false;
+  bool isMicPermissionGranted = false;
   RxBool isLsLoading = false.obs;
   RxString selectedSourceLanguage = ''.obs;
   RxString selectedTargetLanguage = ''.obs;
@@ -100,16 +100,16 @@ class BottomNavTranslationController extends GetxController {
 
   void startVoiceRecording() async {
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
-      isMicStoragePermissionGranted = isPermissionGranted;
+      isMicPermissionGranted = isPermissionGranted;
     });
-    if (isMicStoragePermissionGranted) {
+    if (isMicPermissionGranted) {
       // clear previous recording files and
       // update state
       resetAllValues();
       isMicButtonTapped.value = true;
       await _voiceRecorder.startRecordingVoice();
     } else {
-      showDefaultSnackbar(message: errorMicStoragePermission.tr);
+      showDefaultSnackbar(message: errorMicPermission.tr);
     }
   }
 
@@ -225,9 +225,9 @@ class BottomNavTranslationController extends GetxController {
 
   void playTTSOutput(bool isPlayingForTarget) async {
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
-      isMicStoragePermissionGranted = isPermissionGranted;
+      isMicPermissionGranted = isPermissionGranted;
     });
-    if (isMicStoragePermissionGranted) {
+    if (isMicPermissionGranted) {
       if ((isPlayingForTarget && !isLanguageSwapped) ||
           (isLanguageSwapped && !isPlayingForTarget)) {
         if (targetTTSResponse != null && targetTTSResponse.isNotEmpty) {
