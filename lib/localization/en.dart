@@ -11,10 +11,10 @@ final Map<String, String> en = {
   getStarted: 'Get started',
   speechRecognition: 'Speech Recognition',
   automaticallyRecognizeAndConvert:
-      'Automatically recognize and convert your voice to text',
+      'Automatically recognize and convert your voice into text',
   speechToSpeechTranslation: 'Speech to Speech Translation',
   translateYourVoiceInOneIndianLanguage:
-      'Translate your voice in one Indian language to another Indian language',
+      'Translate your voice in one Indian language to another',
   languageTranslation: 'Language Translation',
   translateSentencesFromOneIndianLanguageToAnother:
       'Translate sentences from one Indian language to another',
@@ -45,7 +45,7 @@ final Map<String, String> en = {
   kHomeLoadingAnimationText: 'Hold up, we are setting up things for you...',
   kTranslateSourceTitle: 'Translate from',
   kTranslateTargetTitle: 'Translate to',
-  kTranslationHintText: 'Start typing or press mic to Begin',
+  kTranslationHintText: 'Start typing or press mic to begin',
   kListeningHintText: 'Listening, Speak now...',
   kPaste: 'Paste',
   kTranslate: 'Translate',
@@ -55,8 +55,7 @@ final Map<String, String> en = {
       'Please select source and target language first',
   errorMicPermission: 'Mic permission required for recording sound',
   errorInRecording: 'Error voice recording',
-  noVoiceAssistantAvailable:
-      'No voice assistant available for following language',
+  noVoiceAssistantAvailable: 'No voice assistant available at the moment',
   kTranslationLoadingAnimationText: 'Translating please wait...',
   errorPleaseSelectLanguage: 'Please select language',
   featureAvailableSoonInfo: 'This feature will be available soon',
@@ -68,4 +67,5 @@ final Map<String, String> en = {
       'Female Voice assistant is not available, Playing from male voice assistant',
   maleVoiceAssistantNotAvailable:
       'Male Voice assistant is not available, Playing from female voice assistant',
+  errorNoTextInClipboard: 'No text available in clipboard',
 };

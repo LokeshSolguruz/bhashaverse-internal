@@ -9,10 +9,22 @@ class AppTextStyle {
     color: balticSea,
   );
 
+  final regular16DolphinGrey = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 16.toFont,
+    color: dolphinGray,
+  );
+
   final regular18DolphinGrey = TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 18.toFont,
     color: dolphinGray,
+  );
+
+  final regular18balticSea = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 18.toFont,
+    color: balticSea,
   );
 
   final regular14Arsenic = TextStyle(

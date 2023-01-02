@@ -59,3 +59,5 @@ const animationHomeLoading =
     'assets/images/lottie_animation/animation_home_loading.json';
 const animationTranslationLoading =
     'assets/images/lottie_animation/animation_translation_loading.json';
+const kLanguageList = 'language_list';
+const kIsSourceLanguage = 'is_source_language';

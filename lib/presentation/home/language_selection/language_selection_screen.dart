@@ -76,7 +76,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                                       _languageSelectionController
                                           .getLanguageList()[index];
                                   List<dynamic> originalLanguageList =
-                                      Get.arguments;
+                                      Get.arguments[kLanguageList];
 
                                   Get.back(
                                       result: originalLanguageList.indexWhere(
@@ -156,7 +156,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         ),
         SizedBox(width: 24.toWidth),
         Text(
-          kTranslateSourceTitle.tr,
+          Get.arguments[kIsSourceLanguage]
+              ? kTranslateSourceTitle.tr
+              : kTranslateTargetTitle.tr,
           style: AppTextStyle().semibold24BalticSea,
         ),
       ],
@@ -184,9 +186,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   }
 
   void setLanguageListFromArgument() {
-    var langFromArgument = Get.arguments;
-    if (langFromArgument != null && langFromArgument.isNotEmpty) {
-      _languageSelectionController.setLanguageList(langFromArgument);
+    var langListArgument = Get.arguments[kLanguageList];
+    if (langListArgument != null && langListArgument.isNotEmpty) {
+      _languageSelectionController.setLanguageList(langListArgument);
     }
   }
 
