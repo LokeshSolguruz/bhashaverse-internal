@@ -10,14 +10,15 @@ import 'constants/app_constants.dart';
 class VoiceRecorder {
   final FlutterSoundRecorder _audioRec = FlutterSoundRecorder();
   String appDocPath = "";
-  String recordedAudioFileName = defaultAudioRecordingName;
+  String recordedAudioFileName =
+      '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}.wav';
   File? audioWavInputFile;
   String _speechToBase64 = '';
 
   Future<void> startRecordingVoice() async {
     await _audioRec.openRecorder();
-    Directory? appDocDir = await getExternalStorageDirectory();
-    appDocPath = appDocDir!.path;
+    Directory? appDocDir = await getApplicationDocumentsDirectory();
+    appDocPath = appDocDir.path;
     await _audioRec.startRecorder(
       toFile: '$appDocPath/$recordedAudioFileName',
     );
