@@ -279,7 +279,6 @@ class BottomNavTranslationController extends GetxController {
     targetLangTextController.clear();
     isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
-    isLanguageSwapped = false;
     isRecordedViaMic.value = false;
     _voiceRecorder.deleteRecordedFile();
     _audioPlayer.deleteTTSFile();
