@@ -62,7 +62,9 @@ class BottomNavTranslationController extends GetxController {
         sourceLanTextController.text = targetLangTextController.value.text;
         targetLangTextController.text = tempSourceLangText;
       }
-      isLanguageSwapped = !isLanguageSwapped;
+      if (isTranslateCompleted.value) {
+        isLanguageSwapped = !isLanguageSwapped;
+      }
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
@@ -211,10 +213,10 @@ class BottomNavTranslationController extends GetxController {
           for (var genderResponse in data) {
             if (genderResponse['gender'] == 'male') {
               targetTTSResponseForMale =
-                  data[0]['output']['audio'][0]['audioContent'] ?? '';
+                  genderResponse['output']['audio'][0]['audioContent'] ?? '';
             } else {
               targetTTSResponseForFemale =
-                  data[0]['output']['audio'][0]['audioContent'] ?? '';
+                  genderResponse['output']['audio'][0]['audioContent'] ?? '';
             }
           }
         }
@@ -280,6 +282,7 @@ class BottomNavTranslationController extends GetxController {
     isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
+    isLanguageSwapped = false;
     _voiceRecorder.deleteRecordedFile();
     _audioPlayer.deleteTTSFile();
     targetTTSResponseForMale = null;
