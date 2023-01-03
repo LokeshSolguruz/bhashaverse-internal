@@ -56,10 +56,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           Expanded(
             flex: 5,
             child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(16)),
-              ),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  border: Border.all(
+                    color: americanSilver,
+                  )),
               child: Obx(
                 () => Stack(
                   children: [
