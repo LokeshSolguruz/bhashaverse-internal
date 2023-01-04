@@ -37,36 +37,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: sassyGreen,
       resizeToAvoidBottomInset: false,
-      body: Obx(
-        () => Stack(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: 40.toHeight,
-                ),
-                Expanded(
-                    child: getCurrentBottomWidget(
-                        _homeController.bottomBarIndex.value)),
-                CustomBottomBar(
-                  currentIndex: _homeController.bottomBarIndex.value,
-                  onChanged: (int index) {
-                    _homeController.bottomBarIndex.value = index;
-                  },
-                ),
-              ],
-            ),
-            if (_homeController.isModelsLoading.value ||
-                _bottomNavTranslationController.isLsLoading.value)
-              LottieAnimation(
-                  context: context,
-                  lottieAsset: _homeController.isModelsLoading.value
-                      ? animationHomeLoading
-                      : animationTranslationLoading,
-                  footerText: _homeController.isModelsLoading.value
-                      ? kHomeLoadingAnimationText.tr
-                      : kTranslationLoadingAnimationText.tr),
-          ],
+      body: SafeArea(
+        child: Obx(
+          () => Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                      child: getCurrentBottomWidget(
+                          _homeController.bottomBarIndex.value)),
+                  CustomBottomBar(
+                    currentIndex: _homeController.bottomBarIndex.value,
+                    onChanged: (int index) {
+                      _homeController.bottomBarIndex.value = index;
+                    },
+                  ),
+                ],
+              ),
+              if (_homeController.isModelsLoading.value ||
+                  _bottomNavTranslationController.isLsLoading.value)
+                LottieAnimation(
+                    context: context,
+                    lottieAsset: _homeController.isModelsLoading.value
+                        ? animationHomeLoading
+                        : animationTranslationLoading,
+                    footerText: _homeController.isModelsLoading.value
+                        ? kHomeLoadingAnimationText.tr
+                        : kTranslationLoadingAnimationText.tr),
+            ],
+          ),
         ),
       ),
     );
