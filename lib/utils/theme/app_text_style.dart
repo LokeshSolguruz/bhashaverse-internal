@@ -44,4 +44,10 @@ class AppTextStyle {
     fontSize: 22.toFont,
     color: balticSea,
   );
+
+  final regular28balticSea = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 28.toFont,
+    color: balticSea,
+  );
 }
