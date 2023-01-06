@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,6 +18,28 @@ class VoiceRecorder {
 
   Future<void> startRecordingVoice() async {
     await _audioRec.openRecorder();
+    final session = await AudioSession.instance;
+
+    if (Platform.isIOS) {
+      await session.configure(AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+        avAudioSessionCategoryOptions:
+            AVAudioSessionCategoryOptions.allowBluetooth |
+                AVAudioSessionCategoryOptions.defaultToSpeaker,
+        avAudioSessionMode: AVAudioSessionMode.spokenAudio,
+        avAudioSessionRouteSharingPolicy:
+            AVAudioSessionRouteSharingPolicy.defaultPolicy,
+        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+        androidAudioAttributes: const AndroidAudioAttributes(
+          contentType: AndroidAudioContentType.speech,
+          flags: AndroidAudioFlags.none,
+          usage: AndroidAudioUsage.voiceCommunication,
+        ),
+        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+        androidWillPauseWhenDucked: true,
+      ));
+    }
+
     Directory? appDocDir = await getApplicationDocumentsDirectory();
     appDocPath = appDocDir.path;
     await _audioRec.startRecorder(
