@@ -52,6 +52,7 @@ dependencies:
   avatar_glow: ^2.0.2
   lottie: ^2.1.0
   share_plus: ^6.3.0
+  audio_session: ^0.1.13
 
 
 dev_dependencies:
