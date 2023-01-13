@@ -1,3 +1,4 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
+import '../../../../utils/date_time_utils.dart';
+import '../../../../utils/wavefrom_style.dart';
 import 'controller/bottom_nav_translation_controller.dart';
 
 class BottomNavTranslation extends StatefulWidget {
@@ -432,77 +435,141 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
       bool isForTargetSection, bool showSoundButton) {
     return Row(
       children: [
+        Visibility(
+          visible: !shouldShowWaveforms(isForTargetSection),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  String shareText = '';
+                  if (isForTargetSection) {
+                    shareText = _bottomNavTranslationController
+                        .targetLangTextController.text;
+                  } else {
+                    shareText = _bottomNavTranslationController
+                        .sourceLanTextController.text;
+                  }
+                  if (shareText.isEmpty) {
+                    showDefaultSnackbar(message: noTextForShare.tr);
+                    return;
+                  } else {
+                    Share.share(shareText);
+                  }
+                },
+                child: Padding(
+                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                  child: SvgPicture.asset(
+                    iconShare,
+                    height: 24.toWidth,
+                    width: 24.toWidth,
+                    color: brightGrey,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.toWidth),
+              InkWell(
+                onTap: () async {
+                  String copyText = '';
+                  if (isForTargetSection) {
+                    copyText = _bottomNavTranslationController
+                        .targetLangTextController.text;
+                  } else {
+                    copyText = _bottomNavTranslationController
+                        .sourceLanTextController.text;
+                  }
+                  if (copyText.isEmpty) {
+                    showDefaultSnackbar(message: noTextForCopy.tr);
+                    return;
+                  } else {
+                    await Clipboard.setData(ClipboardData(text: copyText));
+                    showDefaultSnackbar(message: textCopiedToClipboard.tr);
+                  }
+                },
+                child: Padding(
+                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                  child: SvgPicture.asset(
+                    iconCopy,
+                    height: 24.toWidth,
+                    width: 24.toWidth,
+                    color: brightGrey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Visibility(
+            visible: showSoundButton,
+            child: Obx(
+              () => Row(
+                children: [
+                  Visibility(
+                    visible: shouldShowWaveforms(isForTargetSection),
+                    child: Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                                DateTImeUtils().getTimeFromMilliseconds(
+                                    timeInMillisecond:
+                                        _bottomNavTranslationController
+                                            .maxDuration.value),
+                                style: AppTextStyle().light16BalticSea,
+                                textAlign: TextAlign.center),
+                          ),
+                          SizedBox(width: 8.toWidth),
+                          Expanded(
+                            flex: 3,
+                            child: AudioFileWaveforms(
+                              size: Size(
+                                  ScreenUtil.screenWidth / 2.3, 40.toHeight),
+                              playerController:
+                                  _bottomNavTranslationController.controller,
+                              waveformType: WaveformType.fitWidth,
+                              playerWaveStyle:
+                                  WaveformStyle().defaultPlayerStyle,
+                            ),
+                          ),
+                          SizedBox(width: 8.toWidth),
+                          Expanded(
+                            child: Text(
+                                DateTImeUtils().getTimeFromMilliseconds(
+                                    timeInMillisecond:
+                                        _bottomNavTranslationController
+                                            .currentDuration.value),
+                                style: AppTextStyle().light16BalticSea,
+                                textAlign: TextAlign.center),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // : const Spacer(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 12.toWidth),
         InkWell(
           onTap: () {
-            String shareText = '';
-            if (isForTargetSection) {
-              shareText =
-                  _bottomNavTranslationController.targetLangTextController.text;
-            } else {
-              shareText =
-                  _bottomNavTranslationController.sourceLanTextController.text;
-            }
-            if (shareText.isEmpty) {
-              showDefaultSnackbar(message: noTextForShare.tr);
-              return;
-            } else {
-              Share.share(shareText);
-            }
+            shouldShowWaveforms(isForTargetSection)
+                ? _bottomNavTranslationController.stopPlayer()
+                : _bottomNavTranslationController
+                    .playTTSOutput(isForTargetSection);
           },
-          child: Padding(
-            padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-            child: SvgPicture.asset(
-              iconShare,
-              height: 24.toWidth,
-              width: 24.toWidth,
-              color: brightGrey,
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: flushOrangeColor,
             ),
-          ),
-        ),
-        SizedBox(width: 24.toWidth),
-        InkWell(
-          onTap: () async {
-            String copyText = '';
-            if (isForTargetSection) {
-              copyText =
-                  _bottomNavTranslationController.targetLangTextController.text;
-            } else {
-              copyText =
-                  _bottomNavTranslationController.sourceLanTextController.text;
-            }
-            if (copyText.isEmpty) {
-              showDefaultSnackbar(message: noTextForCopy.tr);
-              return;
-            } else {
-              await Clipboard.setData(ClipboardData(text: copyText));
-              showDefaultSnackbar(message: textCopiedToClipboard.tr);
-            }
-          },
-          child: Padding(
-            padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-            child: SvgPicture.asset(
-              iconCopy,
-              height: 24.toWidth,
-              width: 24.toWidth,
-              color: brightGrey,
-            ),
-          ),
-        ),
-        const Spacer(),
-        Visibility(
-          visible: showSoundButton,
-          child: InkWell(
-            onTap: () {
-              _bottomNavTranslationController.playTTSOutput(isForTargetSection);
-            },
-            child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: flushOrangeColor,
-              ),
-              padding: AppEdgeInsets.instance.all(8),
-              child: SvgPicture.asset(
-                iconSound,
+            padding: AppEdgeInsets.instance.all(8),
+            child: Obx(
+              () => SvgPicture.asset(
+                shouldShowWaveforms(isForTargetSection)
+                    ? iconStopPlayback
+                    : iconSound,
                 height: 24.toWidth,
                 width: 24.toWidth,
                 color: balticSea,
@@ -512,5 +579,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
         ),
       ],
     );
+  }
+
+  bool shouldShowWaveforms(bool isForTargetSection) {
+    return ((isForTargetSection &&
+            _bottomNavTranslationController.isPlayingTarget.value) ||
+        (!isForTargetSection &&
+            _bottomNavTranslationController.isPlayingSource.value));
   }
 }
