@@ -55,6 +55,7 @@ const iconClipBoardText = 'assets/images/common_icon/icon_clipboard_text.svg';
 const iconCopy = 'assets/images/common_icon/icon_copy.svg';
 const iconShare = 'assets/images/common_icon/icon_share.svg';
 const iconSound = 'assets/images/common_icon/icon_sound.svg';
+const iconStopPlayback = 'assets/images/common_icon/icon_stop_playback.svg';
 const animationHomeLoading =
     'assets/images/lottie_animation/animation_home_loading.json';
 const animationTranslationLoading =
