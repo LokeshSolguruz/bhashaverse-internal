@@ -19,7 +19,6 @@ import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
 import '../../../../../utils/permission_handler.dart';
-import '../../../../../utils/screen_util/screen_util.dart';
 import '../../../../../utils/snackbar_utils.dart';
 
 class BottomNavTranslationController extends GetxController {
@@ -62,7 +61,6 @@ class BottomNavTranslationController extends GetxController {
     controller = PlayerController();
 
     controller.onCompletion.listen((event) {
-      print('player state: onCompletion');
       isPlayingSource.value = false;
       isPlayingTarget.value = false;
     });
@@ -320,7 +318,7 @@ class BottomNavTranslationController extends GetxController {
           await targetLanAudioFile?.writeAsBytes(fileAsBytes);
         }
         isPlayingTarget.value = true;
-        await prepare(targetPath);
+        await prepareWaveforms(targetPath, isForTargeLanguage: true);
         isPlayingSource.value = false;
       }
     } else {
@@ -328,7 +326,7 @@ class BottomNavTranslationController extends GetxController {
       if (recordedAudioFilePath != null && recordedAudioFilePath.isNotEmpty) {
         sourcePath = _voiceRecorder.getAudioFilePath()!;
         isPlayingSource.value = true;
-        await prepare(sourcePath);
+        await prepareWaveforms(sourcePath, isForTargeLanguage: false);
         isPlayingTarget.value = false;
       }
     }
@@ -352,22 +350,19 @@ class BottomNavTranslationController extends GetxController {
     targetPath = '';
   }
 
-  Future<void> prepare(String filePath) async {
+  Future<void> prepareWaveforms(
+    String filePath, {
+    required bool isForTargeLanguage,
+  }) async {
     if (controller.playerState == PlayerState.playing ||
         controller.playerState == PlayerState.paused) {
       controller.stopPlayer();
     }
     await controller.preparePlayer(
-      path: filePath,
-      shouldExtractWaveform: false,
-    );
-
-    await controller.extractWaveformData(
-      path: filePath,
-      noOfSamples: WaveformStyle()
-          .defaultPlayerStyle
-          .getSamplesForWidth(ScreenUtil.screenWidth / 2.3),
-    );
+        path: filePath,
+        noOfSamples: WaveformStyle.getDefaultPlayerStyle(
+                isRecordedAudio: !isForTargeLanguage)
+            .getSamplesForWidth(WaveformStyle.getDefaultWidth));
     maxDuration.value = controller.maxDuration;
     startOrStopPlayer();
   }
