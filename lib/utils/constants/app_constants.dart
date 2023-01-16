@@ -57,8 +57,11 @@ const iconShare = 'assets/images/common_icon/icon_share.svg';
 const iconSound = 'assets/images/common_icon/icon_sound.svg';
 const iconStopPlayback = 'assets/images/common_icon/icon_stop_playback.svg';
 const animationHomeLoading =
-    'assets/images/lottie_animation/animation_home_loading.json';
+    'assets/animation/lottie_animation/animation_home_loading.json';
 const animationTranslationLoading =
-    'assets/images/lottie_animation/animation_translation_loading.json';
+    'assets/animation/lottie_animation/animation_translation_loading.json';
+
+const animationStaticWave =
+    'assets/animation/lottie_animation/voice-line-wave-animation.json';
 const kLanguageList = 'language_list';
 const kIsSourceLanguage = 'is_source_language';
