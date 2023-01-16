@@ -104,7 +104,7 @@ flutter:
     - assets/images/common_icon/
     - assets/images/onboarding_image/
     - assets/images/bottom_bar_icons/
-    - assets/images/lottie_animation/
+    - assets/animation/lottie_animation/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
