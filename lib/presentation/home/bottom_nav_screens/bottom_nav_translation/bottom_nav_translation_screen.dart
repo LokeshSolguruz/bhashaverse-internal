@@ -547,9 +547,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
         Visibility(
           visible: showSoundButton,
           child: InkWell(
-            onTap: () {
+            onTap: () async {
               shouldShowWaveforms(isForTargetSection)
-                  ? _bottomNavTranslationController.stopPlayer()
+                  ? await _bottomNavTranslationController.stopPlayer()
                   : _bottomNavTranslationController
                       .playTTSOutput(isForTargetSection);
             },
