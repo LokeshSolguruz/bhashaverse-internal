@@ -36,7 +36,6 @@ class BottomNavTranslationController extends GetxController {
   RxString selectedTargetLanguage = ''.obs;
   dynamic targetTTSResponseForMale;
   dynamic targetTTSResponseForFemale;
-  bool isLanguageSwapped = false;
   RxBool isRecordedViaMic = false.obs;
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
@@ -74,8 +73,6 @@ class BottomNavTranslationController extends GetxController {
         case PlayerState.initialized:
           maxDuration.value = controller.maxDuration;
           break;
-        // case PlayerState.playing:
-        //   break;
         case PlayerState.paused:
           isPlayingSource.value = false;
           isPlayingTarget.value = false;
@@ -105,11 +102,6 @@ class BottomNavTranslationController extends GetxController {
       String tempSourceLanguage = selectedSourceLanguage.value;
       selectedSourceLanguage.value = selectedTargetLanguage.value;
       selectedTargetLanguage.value = tempSourceLanguage;
-      sourceLanTextController.clear();
-      targetLangTextController.clear();
-      if (isTranslateCompleted.value) {
-        isLanguageSwapped = !isLanguageSwapped;
-      }
       resetAllValues();
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
@@ -280,8 +272,7 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void playTTSOutput(bool isPlayingForTarget) async {
-    if ((isPlayingForTarget && !isLanguageSwapped) ||
-        (isLanguageSwapped && !isPlayingForTarget)) {
+    if (isPlayingForTarget) {
       GenderEnum? preferredGender = GenderEnum.values
           .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
 
@@ -338,14 +329,13 @@ class BottomNavTranslationController extends GetxController {
     isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
-    isLanguageSwapped = false;
     await deleteAudioFiles();
     maxDuration.value = 0;
     currentDuration.value = 0;
     sourcePath = '';
     targetTTSResponseForMale = null;
     targetTTSResponseForFemale = null;
-    stopPlayer();
+    await stopPlayer();
     sourcePath = '';
     targetPath = '';
   }
@@ -375,15 +365,15 @@ class BottomNavTranslationController extends GetxController {
           );
   }
 
-  disposePlayer() {
-    if (controller.playerState.isPlaying) {
-      controller.stopAllPlayers();
-    }
+  disposePlayer() async {
+    await stopPlayer();
     controller.dispose();
   }
 
-  void stopPlayer() async {
-    await controller.stopPlayer();
+  Future<void> stopPlayer() async {
+    if (controller.playerState.isPlaying) {
+      await controller.stopPlayer();
+    }
     isPlayingTarget.value = false;
     isPlayingSource.value = false;
   }
