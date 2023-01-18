@@ -1,4 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/utils/remove_glow_effect.dart';
 import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,18 +27,37 @@ class BottomNavTranslation extends StatefulWidget {
   State<BottomNavTranslation> createState() => _BottomNavTranslationState();
 }
 
-class _BottomNavTranslationState extends State<BottomNavTranslation> {
+class _BottomNavTranslationState extends State<BottomNavTranslation>
+    with WidgetsBindingObserver {
   late BottomNavTranslationController _bottomNavTranslationController;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _transLangFocusNode = FocusNode();
+  final hints = [];
 
   @override
   void initState() {
     _bottomNavTranslationController = Get.find();
     _languageModelController = Get.find();
+    WidgetsBinding.instance.addObserver(this);
+
     ScreenUtil().init();
     super.initState();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final newValue = bottomInset > 0.0;
+    if (newValue != _bottomNavTranslationController.isKeyboardVisible.value) {
+      _bottomNavTranslationController.isKeyboardVisible.value = newValue;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -60,7 +80,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             child: AnimatedContainer(
               decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                   border: Border.all(
                     color: americanSilver,
                   )),
@@ -215,15 +235,61 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               ),
             ),
           ),
+          SizedBox(
+            height: 8.toHeight,
+          ),
 
+          SizedBox(
+            height: 40.toHeight,
+            child: Obx(
+              () => Visibility(
+                visible:
+                    _bottomNavTranslationController.isKeyboardVisible.value,
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: ScrollConfiguration(
+                      behavior: RemoveScrollingGlowEffect(),
+                      child: ListView.builder(
+                        itemCount: hints.length,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            color: lilyWhite,
+                            margin: AppEdgeInsets.instance.all(4),
+                            padding: AppEdgeInsets.instance.all(4),
+                            alignment: Alignment.center,
+                            child: Text(
+                              hints[index],
+                              style: AppTextStyle()
+                                  .regular16DolphinGrey
+                                  .copyWith(color: Colors.black),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        },
+                      ),
+                    )),
+              ),
+            ),
+          ),
           // language selection buttons
           SizedBox(
-            height: 35.toHeight,
+            height: 20.toHeight,
           ),
-          _buildSourceTargetLangButtons(),
+          Obx(
+            () => _bottomNavTranslationController.isKeyboardVisible.value
+                ? const SizedBox.shrink()
+                : _buildSourceTargetLangButtons(),
+          ),
 
           // mic button
-          _buildMicButton(),
+          Obx(
+            () => _bottomNavTranslationController.isKeyboardVisible.value
+                ? const SizedBox.shrink()
+                : _buildMicButton(),
+          ),
         ],
       ),
     );
