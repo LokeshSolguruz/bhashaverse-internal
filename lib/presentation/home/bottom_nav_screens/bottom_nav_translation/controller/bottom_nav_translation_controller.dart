@@ -39,6 +39,7 @@ class BottomNavTranslationController extends GetxController {
   RxBool isRecordedViaMic = false.obs;
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
+  RxBool isKeyboardVisible = false.obs;
   String sourcePath = '';
   String targetPath = '';
   RxInt maxDuration = 0.obs;
