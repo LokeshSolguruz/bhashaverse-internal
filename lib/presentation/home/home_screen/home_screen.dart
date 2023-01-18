@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final HomeController _homeController;
   late BottomNavTranslationController _bottomNavTranslationController;
 
@@ -26,15 +26,30 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     _homeController = Get.find();
     _bottomNavTranslationController = Get.find();
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
     _homeController.calcAvailableSourceAndTargetLanguages();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final newValue = bottomInset > 0.0;
+    if (newValue != _homeController.isKeyboardVisible.value) {
+      _homeController.isKeyboardVisible.value = newValue;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: honeydew,
-      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Obx(
           () => Stack(
@@ -44,12 +59,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                       child: getCurrentBottomWidget(
                           _homeController.bottomBarIndex.value)),
-                  CustomBottomBar(
-                    currentIndex: _homeController.bottomBarIndex.value,
-                    onChanged: (int index) {
-                      _homeController.bottomBarIndex.value = index;
-                    },
-                  ),
+                  _homeController.isKeyboardVisible.value
+                      ? const SizedBox.shrink()
+                      : CustomBottomBar(
+                          currentIndex: _homeController.bottomBarIndex.value,
+                          onChanged: (int index) {
+                            _homeController.bottomBarIndex.value = index;
+                          },
+                        )
                 ],
               ),
               if (_homeController.isModelsLoading.value ||
