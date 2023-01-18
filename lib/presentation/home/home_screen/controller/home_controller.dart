@@ -7,7 +7,7 @@ import '../../../../utils/constants/api_constants.dart';
 
 class HomeController extends GetxController {
   RxInt bottomBarIndex = 0.obs;
-  RxBool isModelsLoading = false.obs;
+  RxBool isModelsLoading = false.obs, isKeyboardVisible = false.obs;
 
   late TranslationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
