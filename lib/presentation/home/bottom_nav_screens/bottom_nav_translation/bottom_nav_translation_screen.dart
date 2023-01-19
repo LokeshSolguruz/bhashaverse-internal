@@ -87,6 +87,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      unFocusTextFields();
                                       _bottomNavTranslationController
                                           .resetAllValues();
                                     },
@@ -254,8 +255,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               title: kTranslate.tr,
               isHighlighted: true,
               onTap: () {
-                _sourceLangFocusNode.unfocus();
-                _transLangFocusNode.unfocus();
+                unFocusTextFields();
                 if (_bottomNavTranslationController
                     .sourceLanTextController.text.isEmpty) {
                   showDefaultSnackbar(message: kErrorNoSourceText.tr);
@@ -407,6 +407,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             onTap: () {
               if (_bottomNavTranslationController
                   .isSourceAndTargetLangSelected()) {
+                unFocusTextFields();
                 if (!_bottomNavTranslationController.isMicButtonTapped.value) {
                   _bottomNavTranslationController.startVoiceRecording();
                 } else {
@@ -602,5 +603,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             _bottomNavTranslationController.isPlayingTarget.value) ||
         (!isForTargetSection &&
             _bottomNavTranslationController.isPlayingSource.value));
+  }
+
+  void unFocusTextFields() {
+    _sourceLangFocusNode.unfocus();
+    _transLangFocusNode.unfocus();
   }
 }
