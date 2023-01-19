@@ -43,12 +43,12 @@ class LottieAnimation extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 20.toHeight),
                 LottieBuilder.asset(
                   lottieAsset,
-                  width: 170.toWidth,
+                  width: 80.toWidth,
                   fit: BoxFit.cover,
                 ),
+                SizedBox(height: 14.toHeight),
                 Text(
                   footerText,
                   style: AppTextStyle()
