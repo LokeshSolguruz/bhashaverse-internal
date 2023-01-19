@@ -1,5 +1,3 @@
-import 'dart:ui';
-import 'package:bhashaverse/utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -58,9 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _bottomNavTranslationController.isLsLoading.value)
                 LottieAnimation(
                     context: context,
-                    lottieAsset: _homeController.isModelsLoading.value
-                        ? animationHomeLoading
-                        : animationTranslationLoading,
+                    lottieAsset: animationLoadingLine,
                     footerText: _homeController.isModelsLoading.value
                         ? kHomeLoadingAnimationText.tr
                         : kTranslationLoadingAnimationText.tr),
