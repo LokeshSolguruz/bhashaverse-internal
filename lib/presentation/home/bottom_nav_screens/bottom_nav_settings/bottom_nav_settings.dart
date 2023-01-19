@@ -41,7 +41,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: sassyGreen,
+      backgroundColor: honeydew,
       body: SafeArea(
         child: Padding(
           padding: AppEdgeInsets.instance.symmetric(horizontal: 16),

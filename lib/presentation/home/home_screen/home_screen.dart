@@ -35,8 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: sassyGreen,
-      resizeToAvoidBottomInset: false,
+      backgroundColor: honeydew,
       body: SafeArea(
         child: Obx(
           () => Stack(
