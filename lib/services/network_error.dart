@@ -6,7 +6,9 @@ import 'data_source_manager/exception/exception_helper.dart';
 
 class NetworkError extends ExceptionHandler {
   NetworkError(DioError error) : super(error) {
-    handleDioResponseError(error.response);
+    if (error.type != DioErrorType.cancel) {
+      handleDioResponseError(error.response);
+    }
   }
 
   late ErrorModel _errorModel;
