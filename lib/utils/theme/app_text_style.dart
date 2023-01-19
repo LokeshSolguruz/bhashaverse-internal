@@ -27,6 +27,12 @@ class AppTextStyle {
     color: balticSea,
   );
 
+  final regular12Arsenic = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 12.toFont,
+    color: arsenicColor,
+  );
+
   final regular14Arsenic = TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 14.toFont,

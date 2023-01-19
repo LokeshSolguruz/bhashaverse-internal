@@ -306,7 +306,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           },
           child: Container(
             width: ScreenUtil.screenWidth / 2.8,
-            height: 70.toHeight,
+            height: 50.toHeight,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -365,7 +365,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           },
           child: Container(
             width: ScreenUtil.screenWidth / 2.8,
-            height: 70.toHeight,
+            height: 50.toHeight,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -403,8 +403,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               ),
             ),
           ),
-          FloatingActionButton(
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               if (_bottomNavTranslationController
                   .isSourceAndTargetLangSelected()) {
                 if (!_bottomNavTranslationController.isMicButtonTapped.value) {
@@ -418,11 +418,27 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                     message: kErrorSelectSourceAndTargetScreen.tr);
               }
             },
-            backgroundColor: flushOrangeColor,
-            child: SvgPicture.asset(
-              _bottomNavTranslationController.isMicButtonTapped.value
-                  ? iconListening
-                  : iconMicroPhone,
+            child: PhysicalModel(
+              color: Colors.transparent,
+              shape: BoxShape.circle,
+              elevation: 6,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: flushOrangeColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: AppEdgeInsets.instance.all(20.0),
+                  child: SvgPicture.asset(
+                    _bottomNavTranslationController.isMicButtonTapped.value
+                        ? iconMicStop
+                        : iconMicroPhone,
+                    height: 32.toHeight,
+                    width: 32.toWidth,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -517,26 +533,31 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                         isRecordedAudio: !isForTargetSection),
                   ),
                   SizedBox(width: 8.toWidth),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                          DateTImeUtils().getTimeFromMilliseconds(
-                              timeInMillisecond: _bottomNavTranslationController
-                                  .currentDuration.value),
-                          style: AppTextStyle()
-                              .regular14Arsenic
-                              .copyWith(color: dolphinGray),
-                          textAlign: TextAlign.start),
-                      Text(
-                          DateTImeUtils().getTimeFromMilliseconds(
-                              timeInMillisecond: _bottomNavTranslationController
-                                  .maxDuration.value),
-                          style: AppTextStyle()
-                              .regular14Arsenic
-                              .copyWith(color: dolphinGray),
-                          textAlign: TextAlign.end),
-                    ],
+                  SizedBox(
+                    width: WaveformStyle.getDefaultWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                            DateTImeUtils().getTimeFromMilliseconds(
+                                timeInMillisecond:
+                                    _bottomNavTranslationController
+                                        .currentDuration.value),
+                            style: AppTextStyle()
+                                .regular12Arsenic
+                                .copyWith(color: manateeGray),
+                            textAlign: TextAlign.start),
+                        Text(
+                            DateTImeUtils().getTimeFromMilliseconds(
+                                timeInMillisecond:
+                                    _bottomNavTranslationController
+                                        .maxDuration.value),
+                            style: AppTextStyle()
+                                .regular12Arsenic
+                                .copyWith(color: manateeGray),
+                            textAlign: TextAlign.end),
+                      ],
+                    ),
                   ),
                 ],
               ),
