@@ -11,6 +11,7 @@ class APIConstants {
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
   static const String SEARCH_REQ_URL = '/v0/model/search';
+  static const String TRANSLITERATION_REQ_URL = '/v0/model/compute';
   static const String ASR_REQ_URL = '/asr/v1/model/compute';
   static const String TRANS_REQ_URL = '/v0/model/compute';
   static const String TTS_REQ_URL = '/v0/model/compute';
@@ -47,7 +48,8 @@ class APIConstants {
   static final List<String> TYPES_OF_MODELS_LIST = [
     'asr',
     'translation',
-    'tts'
+    'tts',
+    'transliteration',
   ];
 
   // Keys shall be same as values in TYPES_OF_MODELS_LIST
@@ -55,6 +57,7 @@ class APIConstants {
     TYPES_OF_MODELS_LIST[0]: 'OpenAI,AI4Bharat,batch,stream',
     TYPES_OF_MODELS_LIST[1]: 'AI4Bharat,',
     TYPES_OF_MODELS_LIST[2]: 'AI4Bharat,',
+    TYPES_OF_MODELS_LIST[3]: 'AI4Bharat,',
   };
 
   static const kNativeName = 'native_name';
