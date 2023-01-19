@@ -8,6 +8,7 @@ import 'package:bhashaverse/utils/wavefrom_style.dart';
 import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:bhashaverse/enums/language_enum.dart';
 import 'package:bhashaverse/utils/voice_recorder.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,6 +46,7 @@ class BottomNavTranslationController extends GetxController {
   RxInt maxDuration = 0.obs;
   RxInt currentDuration = 0.obs;
   File? targetLanAudioFile;
+  RxList transliterationWordHints = [].obs;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -166,6 +168,33 @@ class BottomNavTranslationController extends GetxController {
     } else {
       await getASROutput(base64EncodedAudioContent);
     }
+  }
+
+  Future<void> getTransliterationOutput(String sourceText) async {
+    var transliterationPayloadToSend = {};
+    transliterationPayloadToSend['input'] = [
+      {'source': sourceText}
+    ];
+
+    transliterationPayloadToSend['modelId'] =
+        transliterationPayloadToSend['modelId'] = _languageModelController
+            .getAvailableTransliterationModelsForLanguage(
+                getSelectedSourceLangCode());
+    transliterationPayloadToSend['task'] = 'transliteration';
+    transliterationPayloadToSend['userId'] = null;
+
+    var response = await _translationAppAPIClient.sendTransliterationRequest(
+        transliterationPayload: transliterationPayloadToSend);
+
+    response?.when(
+      success: (data) async {
+        transliterationWordHints.value = data['target'];
+      },
+      failure: (error) {
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+      },
+    );
   }
 
   Future<void> getASROutput(String base64EncodedAudioContent) async {
@@ -322,6 +351,11 @@ class BottomNavTranslationController extends GetxController {
         isPlayingTarget.value = false;
       }
     }
+  }
+
+  void cancelPreviousTransliterationRequest() {
+    _translationAppAPIClient.transliterationAPIcancelToken.cancel();
+    _translationAppAPIClient.transliterationAPIcancelToken = CancelToken();
   }
 
   void resetAllValues() async {

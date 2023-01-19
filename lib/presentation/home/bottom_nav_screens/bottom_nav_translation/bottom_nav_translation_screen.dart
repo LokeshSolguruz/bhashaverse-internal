@@ -33,7 +33,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _transLangFocusNode = FocusNode();
-  final hints = [];
 
   @override
   void initState() {
@@ -122,7 +121,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                               ),
                             ),
                             SizedBox(height: 6.toHeight),
-                            // Source language tex field
+                            // Source language text field
                             Flexible(
                               child: TextField(
                                 controller: _bottomNavTranslationController
@@ -155,6 +154,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
                                 ),
+                                onChanged: (newText) {
+                                  getTransliterationHints(newText);
+                                },
                               ),
                             ),
                             SizedBox(height: 6.toHeight),
@@ -250,22 +252,35 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                     child: ScrollConfiguration(
                       behavior: RemoveScrollingGlowEffect(),
                       child: ListView.builder(
-                        itemCount: hints.length,
+                        itemCount: _bottomNavTranslationController
+                            .transliterationWordHints.length,
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
-                          return Container(
-                            color: lilyWhite,
-                            margin: AppEdgeInsets.instance.all(4),
-                            padding: AppEdgeInsets.instance.all(4),
-                            alignment: Alignment.center,
-                            child: Text(
-                              hints[index],
-                              style: AppTextStyle()
-                                  .regular16DolphinGrey
-                                  .copyWith(color: Colors.black),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          String currentHintText =
+                              _bottomNavTranslationController
+                                  .transliterationWordHints[index];
+                          return GestureDetector(
+                            onTap: () {
+                              replaceTextWithTransliterationHint(
+                                  currentHintText);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: lilyWhite,
+                              ),
+                              margin: AppEdgeInsets.instance.all(4),
+                              padding: AppEdgeInsets.instance.all(4),
+                              alignment: Alignment.center,
+                              child: Text(
+                                currentHintText,
+                                style: AppTextStyle()
+                                    .regular16DolphinGrey
+                                    .copyWith(color: Colors.black),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           );
                         },
@@ -662,6 +677,35 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         ),
       ],
     );
+  }
+
+  void getTransliterationHints(String newText) {
+    _bottomNavTranslationController.cancelPreviousTransliterationRequest();
+    String wordToSend = newText.split(" ").last;
+    if (wordToSend.isNotEmpty) {
+      if (_bottomNavTranslationController
+          .selectedSourceLanguage.value.isNotEmpty) {
+        _bottomNavTranslationController.getTransliterationOutput(wordToSend);
+      }
+    } else {
+      _bottomNavTranslationController.transliterationWordHints.clear();
+    }
+  }
+
+  void replaceTextWithTransliterationHint(String currentHintText) {
+    List<String> oldString = _bottomNavTranslationController
+        .sourceLanTextController.text
+        .trim()
+        .split(' ');
+    oldString.removeLast();
+    oldString.add(currentHintText);
+    _bottomNavTranslationController.sourceLanTextController.text =
+        '${oldString.join(' ')} ';
+    _bottomNavTranslationController.sourceLanTextController.selection =
+        TextSelection.fromPosition(TextPosition(
+            offset: _bottomNavTranslationController
+                .sourceLanTextController.text.length));
+    _bottomNavTranslationController.transliterationWordHints.clear();
   }
 
   bool shouldShowWaveforms(bool isForTargetSection) {
