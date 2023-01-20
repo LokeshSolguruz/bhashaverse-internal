@@ -196,8 +196,9 @@ class BottomNavTranslationController extends GetxController {
 
     response?.when(
       success: (data) async {
-        if (currentlyTypedWordForTransliteration == data['source']) {
-          transliterationWordHints.value = data['target'];
+        if (currentlyTypedWordForTransliteration ==
+            data['output'][0]['source']) {
+          transliterationWordHints.value = data['output'][0]['target'];
           transliterationWordHints.add(currentlyTypedWordForTransliteration);
         }
       },
