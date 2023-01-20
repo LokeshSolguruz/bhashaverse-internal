@@ -398,7 +398,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             child: Padding(
               padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
               child: LottieBuilder.asset(
-                animationStaticWave,
+                animationStaticWaveForRecording,
                 fit: BoxFit.cover,
               ),
             ),

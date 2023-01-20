@@ -64,7 +64,7 @@ const animationLoadingLine =
 const animationTranslationLoading =
     'assets/animation/lottie_animation/animation_translation_loading.json';
 
-const animationStaticWave =
+const animationStaticWaveForRecording =
     'assets/animation/lottie_animation/voice-line-wave-animation.json';
 const kLanguageList = 'language_list';
 const kIsSourceLanguage = 'is_source_language';
