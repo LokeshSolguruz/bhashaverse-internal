@@ -29,6 +29,9 @@ class BottomNavTranslationController extends GetxController {
   TextEditingController sourceLanTextController = TextEditingController();
   TextEditingController targetLangTextController = TextEditingController();
 
+  final ScrollController transliterationHintsScrollController =
+      ScrollController();
+
   RxBool isTranslateCompleted = false.obs;
   RxBool isMicButtonTapped = false.obs;
   bool isMicPermissionGranted = false;
@@ -47,7 +50,9 @@ class BottomNavTranslationController extends GetxController {
   RxInt currentDuration = 0.obs;
   File? targetLanAudioFile;
   RxList transliterationWordHints = [].obs;
+  String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
+  RxBool isScrolledTransliterationHints = false.obs;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -89,6 +94,9 @@ class BottomNavTranslationController extends GetxController {
       }
     });
 
+    transliterationHintsScrollController.addListener(() {
+      isScrolledTransliterationHints.value = true;
+    });
     super.onInit();
   }
 
@@ -173,12 +181,9 @@ class BottomNavTranslationController extends GetxController {
 
   Future<void> getTransliterationOutput(String sourceText) async {
     currentlyTypedWordForTransliteration = sourceText;
-    String? transliterationModelToUse =
-        _languageModelController.getAvailableTransliterationModelsForLanguage(
-            getSelectedSourceLangCode());
     if (transliterationModelToUse == null ||
-        transliterationModelToUse.isEmpty) {
-      transliterationWordHints.clear();
+        transliterationModelToUse!.isEmpty) {
+      clearTransliterationHints();
       return;
     }
     var transliterationPayloadToSend = {};
@@ -199,7 +204,10 @@ class BottomNavTranslationController extends GetxController {
         if (currentlyTypedWordForTransliteration ==
             data['output'][0]['source']) {
           transliterationWordHints.value = data['output'][0]['target'];
-          transliterationWordHints.add(currentlyTypedWordForTransliteration);
+          if (!transliterationWordHints
+              .contains(currentlyTypedWordForTransliteration)) {
+            transliterationWordHints.add(currentlyTypedWordForTransliteration);
+          }
         }
       },
       failure: (error) {
@@ -365,6 +373,17 @@ class BottomNavTranslationController extends GetxController {
     }
   }
 
+  void setModelForTransliteration() {
+    transliterationModelToUse =
+        _languageModelController.getAvailableTransliterationModelsForLanguage(
+            getSelectedSourceLangCode());
+  }
+
+  void clearTransliterationHints() {
+    transliterationWordHints.clear();
+    currentlyTypedWordForTransliteration = '';
+  }
+
   void cancelPreviousTransliterationRequest() {
     _translationAppAPIClient.transliterationAPIcancelToken.cancel();
     _translationAppAPIClient.transliterationAPIcancelToken = CancelToken();
@@ -385,6 +404,10 @@ class BottomNavTranslationController extends GetxController {
     await stopPlayer();
     sourcePath = '';
     targetPath = '';
+    if (isTransliterationEnabled()) {
+      setModelForTransliteration();
+      clearTransliterationHints();
+    }
   }
 
   Future<void> prepareWaveforms(
@@ -432,7 +455,7 @@ class BottomNavTranslationController extends GetxController {
     }
   }
 
-  bool getIsTransliterationEnabled() {
+  bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
   }
 }
