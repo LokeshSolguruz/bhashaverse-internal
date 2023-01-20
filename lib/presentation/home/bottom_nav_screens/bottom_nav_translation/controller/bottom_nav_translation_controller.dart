@@ -1,11 +1,18 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:bhashaverse/common/controller/language_model_controller.dart';
+import 'package:bhashaverse/utils/wavefrom_style.dart';
 import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:bhashaverse/enums/language_enum.dart';
-import 'package:bhashaverse/utils/audio_player.dart';
 import 'package:bhashaverse/utils/voice_recorder.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../../../localization/localization_keys.dart';
 import '../../../../../services/translation_app_api_client.dart';
@@ -29,19 +36,55 @@ class BottomNavTranslationController extends GetxController {
   RxString selectedTargetLanguage = ''.obs;
   dynamic targetTTSResponseForMale;
   dynamic targetTTSResponseForFemale;
-  bool isLanguageSwapped = false;
   RxBool isRecordedViaMic = false.obs;
+  RxBool isPlayingSource = false.obs;
+  RxBool isPlayingTarget = false.obs;
+  String sourcePath = '';
+  String targetPath = '';
+  RxInt maxDuration = 0.obs;
+  RxInt currentDuration = 0.obs;
+  File? targetLanAudioFile;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
-  final AudioPlayer _audioPlayer = AudioPlayer();
 
   late final Box _hiveDBInstance;
+
+  late PlayerController controller;
 
   @override
   void onInit() {
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+
+    controller = PlayerController();
+
+    controller.onCompletion.listen((event) {
+      isPlayingSource.value = false;
+      isPlayingTarget.value = false;
+    });
+
+    controller.onCurrentDurationChanged.listen((duration) {
+      currentDuration.value = duration;
+    });
+
+    controller.onPlayerStateChanged.listen((_) {
+      switch (controller.playerState) {
+        case PlayerState.initialized:
+          maxDuration.value = controller.maxDuration;
+          break;
+        case PlayerState.paused:
+          isPlayingSource.value = false;
+          isPlayingTarget.value = false;
+          currentDuration.value = 0;
+          break;
+        case PlayerState.stopped:
+          currentDuration.value = 0;
+          break;
+        default:
+      }
+    });
+
     super.onInit();
   }
 
@@ -49,6 +92,8 @@ class BottomNavTranslationController extends GetxController {
   void onClose() {
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
+    disposePlayer();
+    deleteAudioFiles();
     super.onClose();
   }
 
@@ -57,14 +102,7 @@ class BottomNavTranslationController extends GetxController {
       String tempSourceLanguage = selectedSourceLanguage.value;
       selectedSourceLanguage.value = selectedTargetLanguage.value;
       selectedTargetLanguage.value = tempSourceLanguage;
-      if (isTranslateCompleted.value) {
-        String tempSourceLangText = sourceLanTextController.value.text;
-        sourceLanTextController.text = targetLangTextController.value.text;
-        targetLangTextController.text = tempSourceLangText;
-      }
-      if (isTranslateCompleted.value) {
-        isLanguageSwapped = !isLanguageSwapped;
-      }
+      resetAllValues();
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
@@ -234,58 +272,116 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void playTTSOutput(bool isPlayingForTarget) async {
-    await PermissionHandler.requestPermissions().then((isPermissionGranted) {
-      isMicPermissionGranted = isPermissionGranted;
-    });
-    if (isMicPermissionGranted) {
-      if ((isPlayingForTarget && !isLanguageSwapped) ||
-          (isLanguageSwapped && !isPlayingForTarget)) {
-        GenderEnum? preferredGender = GenderEnum.values
-            .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
+    if (isPlayingForTarget) {
+      GenderEnum? preferredGender = GenderEnum.values
+          .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
 
-        bool isMaleTTSAvailable = targetTTSResponseForMale != null &&
-            targetTTSResponseForMale.isNotEmpty;
+      bool isMaleTTSAvailable = targetTTSResponseForMale != null &&
+          targetTTSResponseForMale.isNotEmpty;
 
-        bool isFemaleTTSAvailable = targetTTSResponseForFemale != null &&
-            targetTTSResponseForFemale.isNotEmpty;
+      bool isFemaleTTSAvailable = targetTTSResponseForFemale != null &&
+          targetTTSResponseForFemale.isNotEmpty;
 
-        _audioPlayer.deleteTTSFile();
-
-        if ((preferredGender == GenderEnum.male && isMaleTTSAvailable) ||
-            (!isFemaleTTSAvailable && isMaleTTSAvailable)) {
-          if (preferredGender == GenderEnum.female) {
-            showDefaultSnackbar(message: femaleVoiceAssistantNotAvailable.tr);
-          }
-          _audioPlayer.playAudioFromBase64(targetTTSResponseForMale);
-        } else if ((preferredGender == GenderEnum.female &&
-                isFemaleTTSAvailable) ||
-            (!isMaleTTSAvailable && isFemaleTTSAvailable)) {
-          if (preferredGender == GenderEnum.male) {
-            showDefaultSnackbar(message: maleVoiceAssistantNotAvailable.tr);
-          }
-          _audioPlayer.playAudioFromBase64(targetTTSResponseForFemale);
-        } else {
-          showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+      Uint8List? fileAsBytes;
+      if ((preferredGender == GenderEnum.male && isMaleTTSAvailable) ||
+          (!isFemaleTTSAvailable && isMaleTTSAvailable)) {
+        if (preferredGender == GenderEnum.female) {
+          showDefaultSnackbar(message: femaleVoiceAssistantNotAvailable.tr);
         }
+        fileAsBytes = base64Decode(targetTTSResponseForMale);
+      } else if ((preferredGender == GenderEnum.female &&
+              isFemaleTTSAvailable) ||
+          (!isMaleTTSAvailable && isFemaleTTSAvailable)) {
+        if (preferredGender == GenderEnum.male) {
+          showDefaultSnackbar(message: maleVoiceAssistantNotAvailable.tr);
+        }
+        fileAsBytes = base64Decode(targetTTSResponseForFemale);
       } else {
-        String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
-        if (recordedAudioFilePath != null && recordedAudioFilePath.isNotEmpty) {
-          _audioPlayer.playAudioFromFile(_voiceRecorder.getAudioFilePath()!);
+        showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+      }
+
+      if (fileAsBytes != null) {
+        Directory appDocDir = await getApplicationDocumentsDirectory();
+        targetPath =
+            '${appDocDir.path}/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
+        targetLanAudioFile = File(targetPath);
+        if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
+          await targetLanAudioFile?.writeAsBytes(fileAsBytes);
         }
+        isPlayingTarget.value = true;
+        await prepareWaveforms(targetPath, isForTargeLanguage: true);
+        isPlayingSource.value = false;
+      }
+    } else {
+      String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
+      if (recordedAudioFilePath != null && recordedAudioFilePath.isNotEmpty) {
+        sourcePath = _voiceRecorder.getAudioFilePath()!;
+        isPlayingSource.value = true;
+        await prepareWaveforms(sourcePath, isForTargeLanguage: false);
+        isPlayingTarget.value = false;
       }
     }
   }
 
-  void resetAllValues() {
+  void resetAllValues() async {
     sourceLanTextController.clear();
     targetLangTextController.clear();
     isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
-    isLanguageSwapped = false;
-    _voiceRecorder.deleteRecordedFile();
-    _audioPlayer.deleteTTSFile();
+    await deleteAudioFiles();
+    maxDuration.value = 0;
+    currentDuration.value = 0;
+    sourcePath = '';
     targetTTSResponseForMale = null;
     targetTTSResponseForFemale = null;
+    await stopPlayer();
+    sourcePath = '';
+    targetPath = '';
+  }
+
+  Future<void> prepareWaveforms(
+    String filePath, {
+    required bool isForTargeLanguage,
+  }) async {
+    if (controller.playerState == PlayerState.playing ||
+        controller.playerState == PlayerState.paused) {
+      controller.stopPlayer();
+    }
+    await controller.preparePlayer(
+        path: filePath,
+        noOfSamples: WaveformStyle.getDefaultPlayerStyle(
+                isRecordedAudio: !isForTargeLanguage)
+            .getSamplesForWidth(WaveformStyle.getDefaultWidth));
+    maxDuration.value = controller.maxDuration;
+    startOrStopPlayer();
+  }
+
+  void startOrStopPlayer() async {
+    controller.playerState.isPlaying
+        ? await controller.pausePlayer()
+        : await controller.startPlayer(
+            finishMode: FinishMode.pause,
+          );
+  }
+
+  disposePlayer() async {
+    await stopPlayer();
+    controller.dispose();
+  }
+
+  Future<void> stopPlayer() async {
+    if (controller.playerState.isPlaying) {
+      await controller.stopPlayer();
+    }
+    isPlayingTarget.value = false;
+    isPlayingSource.value = false;
+  }
+
+  Future<void> deleteAudioFiles() async {
+    _voiceRecorder.deleteRecordedFile();
+    if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
+      await targetLanAudioFile?.delete();
+    }
   }
 }

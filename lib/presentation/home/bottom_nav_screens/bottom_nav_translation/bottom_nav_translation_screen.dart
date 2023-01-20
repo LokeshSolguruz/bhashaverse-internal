@@ -1,9 +1,10 @@
-import 'package:avatar_glow/avatar_glow.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
@@ -14,6 +15,8 @@ import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
+import '../../../../utils/date_time_utils.dart';
+import '../../../../utils/wavefrom_style.dart';
 import 'controller/bottom_nav_translation_controller.dart';
 
 class BottomNavTranslation extends StatefulWidget {
@@ -84,6 +87,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      unFocusTextFields();
                                       _bottomNavTranslationController
                                           .resetAllValues();
                                     },
@@ -137,11 +141,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                             if (_bottomNavTranslationController
                                 .isTranslateCompleted.value)
                               _buildSourceTargetTextActions(
-                                  false,
-                                  (_bottomNavTranslationController
-                                          .isRecordedViaMic.value ||
+                                  isForTargetSection: false,
+                                  showSoundButton:
                                       _bottomNavTranslationController
-                                          .isLanguageSwapped)),
+                                          .isRecordedViaMic.value),
                           ],
                         ),
                       ),
@@ -198,13 +201,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                     if (_bottomNavTranslationController
                                         .isTranslateCompleted.value)
                                       _buildSourceTargetTextActions(
-                                          true,
-                                          (!_bottomNavTranslationController
-                                                  .isLanguageSwapped ||
-                                              (_bottomNavTranslationController
-                                                      .isRecordedViaMic.value &&
-                                                  _bottomNavTranslationController
-                                                      .isLanguageSwapped))),
+                                          isForTargetSection: true),
                                   ],
                                 ),
                               ),
@@ -226,9 +223,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           _buildSourceTargetLangButtons(),
 
           // mic button
-          SizedBox(
-            height: 20.toHeight,
-          ),
           _buildMicButton(),
         ],
       ),
@@ -261,8 +255,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               title: kTranslate.tr,
               isHighlighted: true,
               onTap: () {
-                _sourceLangFocusNode.unfocus();
-                _transLangFocusNode.unfocus();
+                unFocusTextFields();
                 if (_bottomNavTranslationController
                     .sourceLanTextController.text.isEmpty) {
                   showDefaultSnackbar(message: kErrorNoSourceText.tr);
@@ -313,7 +306,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           },
           child: Container(
             width: ScreenUtil.screenWidth / 2.8,
-            height: 70.toHeight,
+            height: 50.toHeight,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -372,7 +365,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
           },
           child: Container(
             width: ScreenUtil.screenWidth / 2.8,
-            height: 70.toHeight,
+            height: 50.toHeight,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -394,106 +387,193 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
 
   Widget _buildMicButton() {
     return Obx(
-      () => AvatarGlow(
-        animate: _bottomNavTranslationController.isMicButtonTapped.value,
-        glowColor: flushOrangeColor,
-        endRadius: 40.0,
-        duration: const Duration(milliseconds: 1000),
-        repeat: true,
-        showTwoGlows: true,
-        startDelay: const Duration(milliseconds: 300),
-        child: FloatingActionButton(
-          onPressed: () {
-            if (_bottomNavTranslationController
-                .isSourceAndTargetLangSelected()) {
-              if (!_bottomNavTranslationController.isMicButtonTapped.value) {
-                _bottomNavTranslationController.startVoiceRecording();
-              } else {
-                _bottomNavTranslationController
-                    .stopVoiceRecordingAndGetResult();
-              }
-            } else {
-              showDefaultSnackbar(
-                  message: kErrorSelectSourceAndTargetScreen.tr);
-            }
-          },
-          backgroundColor: flushOrangeColor,
-          child: SvgPicture.asset(
-            _bottomNavTranslationController.isMicButtonTapped.value
-                ? iconListening
-                : iconMicroPhone,
+      () => Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          AnimatedOpacity(
+            opacity:
+                _bottomNavTranslationController.isMicButtonTapped.value ? 1 : 0,
+            duration: const Duration(milliseconds: 600),
+            child: Padding(
+              padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
+              child: LottieBuilder.asset(
+                animationStaticWaveForRecording,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
+          GestureDetector(
+            onTap: () {
+              if (_bottomNavTranslationController
+                  .isSourceAndTargetLangSelected()) {
+                unFocusTextFields();
+                if (!_bottomNavTranslationController.isMicButtonTapped.value) {
+                  _bottomNavTranslationController.startVoiceRecording();
+                } else {
+                  _bottomNavTranslationController
+                      .stopVoiceRecordingAndGetResult();
+                }
+              } else {
+                showDefaultSnackbar(
+                    message: kErrorSelectSourceAndTargetScreen.tr);
+              }
+            },
+            child: PhysicalModel(
+              color: Colors.transparent,
+              shape: BoxShape.circle,
+              elevation: 6,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: flushOrangeColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: AppEdgeInsets.instance.all(20.0),
+                  child: SvgPicture.asset(
+                    _bottomNavTranslationController.isMicButtonTapped.value
+                        ? iconMicStop
+                        : iconMicroPhone,
+                    height: 32.toHeight,
+                    width: 32.toWidth,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSourceTargetTextActions(
-      bool isForTargetSection, bool showSoundButton) {
+  Widget _buildSourceTargetTextActions({
+    required bool isForTargetSection,
+    bool showSoundButton = true,
+  }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        InkWell(
-          onTap: () {
-            String shareText = '';
-            if (isForTargetSection) {
-              shareText =
-                  _bottomNavTranslationController.targetLangTextController.text;
-            } else {
-              shareText =
-                  _bottomNavTranslationController.sourceLanTextController.text;
-            }
-            if (shareText.isEmpty) {
-              showDefaultSnackbar(message: noTextForShare.tr);
-              return;
-            } else {
-              Share.share(shareText);
-            }
-          },
-          child: Padding(
-            padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-            child: SvgPicture.asset(
-              iconShare,
-              height: 24.toWidth,
-              width: 24.toWidth,
-              color: brightGrey,
+        Visibility(
+          visible: !shouldShowWaveforms(isForTargetSection),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  String shareText = '';
+                  if (isForTargetSection) {
+                    shareText = _bottomNavTranslationController
+                        .targetLangTextController.text;
+                  } else {
+                    shareText = _bottomNavTranslationController
+                        .sourceLanTextController.text;
+                  }
+                  if (shareText.isEmpty) {
+                    showDefaultSnackbar(message: noTextForShare.tr);
+                    return;
+                  } else {
+                    Share.share(shareText);
+                  }
+                },
+                child: Padding(
+                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                  child: SvgPicture.asset(
+                    iconShare,
+                    height: 24.toWidth,
+                    width: 24.toWidth,
+                    color: brightGrey,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.toWidth),
+              InkWell(
+                onTap: () async {
+                  String copyText = '';
+                  if (isForTargetSection) {
+                    copyText = _bottomNavTranslationController
+                        .targetLangTextController.text;
+                  } else {
+                    copyText = _bottomNavTranslationController
+                        .sourceLanTextController.text;
+                  }
+                  if (copyText.isEmpty) {
+                    showDefaultSnackbar(message: noTextForCopy.tr);
+                    return;
+                  } else {
+                    await Clipboard.setData(ClipboardData(text: copyText));
+                    showDefaultSnackbar(message: textCopiedToClipboard.tr);
+                  }
+                },
+                child: Padding(
+                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                  child: SvgPicture.asset(
+                    iconCopy,
+                    height: 24.toWidth,
+                    width: 24.toWidth,
+                    color: brightGrey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Obx(
+            () => Visibility(
+              visible: shouldShowWaveforms(isForTargetSection),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AudioFileWaveforms(
+                    size: Size(WaveformStyle.getDefaultWidth,
+                        WaveformStyle.getDefaultHeight),
+                    playerController:
+                        _bottomNavTranslationController.controller,
+                    waveformType: WaveformType.fitWidth,
+                    playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
+                        isRecordedAudio: !isForTargetSection),
+                  ),
+                  SizedBox(width: 8.toWidth),
+                  SizedBox(
+                    width: WaveformStyle.getDefaultWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                            DateTImeUtils().getTimeFromMilliseconds(
+                                timeInMillisecond:
+                                    _bottomNavTranslationController
+                                        .currentDuration.value),
+                            style: AppTextStyle()
+                                .regular12Arsenic
+                                .copyWith(color: manateeGray),
+                            textAlign: TextAlign.start),
+                        Text(
+                            DateTImeUtils().getTimeFromMilliseconds(
+                                timeInMillisecond:
+                                    _bottomNavTranslationController
+                                        .maxDuration.value),
+                            style: AppTextStyle()
+                                .regular12Arsenic
+                                .copyWith(color: manateeGray),
+                            textAlign: TextAlign.end),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        SizedBox(width: 24.toWidth),
-        InkWell(
-          onTap: () async {
-            String copyText = '';
-            if (isForTargetSection) {
-              copyText =
-                  _bottomNavTranslationController.targetLangTextController.text;
-            } else {
-              copyText =
-                  _bottomNavTranslationController.sourceLanTextController.text;
-            }
-            if (copyText.isEmpty) {
-              showDefaultSnackbar(message: noTextForCopy.tr);
-              return;
-            } else {
-              await Clipboard.setData(ClipboardData(text: copyText));
-              showDefaultSnackbar(message: textCopiedToClipboard.tr);
-            }
-          },
-          child: Padding(
-            padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-            child: SvgPicture.asset(
-              iconCopy,
-              height: 24.toWidth,
-              width: 24.toWidth,
-              color: brightGrey,
-            ),
-          ),
-        ),
-        const Spacer(),
+        SizedBox(width: 12.toWidth),
         Visibility(
           visible: showSoundButton,
           child: InkWell(
-            onTap: () {
-              _bottomNavTranslationController.playTTSOutput(isForTargetSection);
+            onTap: () async {
+              shouldShowWaveforms(isForTargetSection)
+                  ? await _bottomNavTranslationController.stopPlayer()
+                  : _bottomNavTranslationController
+                      .playTTSOutput(isForTargetSection);
             },
             child: Container(
               decoration: const BoxDecoration(
@@ -501,16 +581,32 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                 color: flushOrangeColor,
               ),
               padding: AppEdgeInsets.instance.all(8),
-              child: SvgPicture.asset(
-                iconSound,
-                height: 24.toWidth,
-                width: 24.toWidth,
-                color: balticSea,
+              child: Obx(
+                () => SvgPicture.asset(
+                  shouldShowWaveforms(isForTargetSection)
+                      ? iconStopPlayback
+                      : iconSound,
+                  height: 24.toWidth,
+                  width: 24.toWidth,
+                  color: balticSea,
+                ),
               ),
             ),
           ),
         ),
       ],
     );
+  }
+
+  bool shouldShowWaveforms(bool isForTargetSection) {
+    return ((isForTargetSection &&
+            _bottomNavTranslationController.isPlayingTarget.value) ||
+        (!isForTargetSection &&
+            _bottomNavTranslationController.isPlayingSource.value));
+  }
+
+  void unFocusTextFields() {
+    _sourceLangFocusNode.unfocus();
+    _transLangFocusNode.unfocus();
   }
 }
