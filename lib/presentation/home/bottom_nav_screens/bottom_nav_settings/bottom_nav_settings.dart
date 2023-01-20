@@ -98,15 +98,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                     activeColor: japaneseLaurel,
                     trackColor: americanSilver,
                     onChanged: (value) {
+                      _hiveDBInstance.put(enableTransliteration, value);
                       _settingsController.isTransLiterationOn.value = value;
-                      if (value) {
-                        showDefaultSnackbar(
-                            message: featureAvailableSoonInfo.tr);
-                        Future.delayed(const Duration(seconds: 2))
-                            .then((value) {
-                          _settingsController.isTransLiterationOn.value = false;
-                        });
-                      }
                     },
                   ),
                 ),

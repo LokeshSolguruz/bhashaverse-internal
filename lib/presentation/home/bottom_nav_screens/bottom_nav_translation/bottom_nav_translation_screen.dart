@@ -155,7 +155,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   contentPadding: EdgeInsets.zero,
                                 ),
                                 onChanged: (newText) {
-                                  getTransliterationHints(newText);
+                                  if (_bottomNavTranslationController
+                                      .getIsTransliterationEnabled()) {
+                                    getTransliterationHints(newText);
+                                  } else {
+                                    _bottomNavTranslationController
+                                        .transliterationWordHints
+                                        .clear();
+                                  }
                                 },
                               ),
                             ),
@@ -242,50 +249,83 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           ),
 
           SizedBox(
-            height: 40.toHeight,
+            // height: 40.toHeight,
             child: Obx(
               () => Visibility(
                 visible:
                     _bottomNavTranslationController.isKeyboardVisible.value,
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ScrollConfiguration(
-                      behavior: RemoveScrollingGlowEffect(),
-                      child: ListView.builder(
-                        itemCount: _bottomNavTranslationController
-                            .transliterationWordHints.length,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          String currentHintText =
-                              _bottomNavTranslationController
-                                  .transliterationWordHints[index];
-                          return GestureDetector(
-                            onTap: () {
-                              replaceTextWithTransliterationHint(
-                                  currentHintText);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: lilyWhite,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ..._bottomNavTranslationController.transliterationWordHints
+                        .map((element) => Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  replaceTextWithTransliterationHint(element);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: lilyWhite,
+                                  ),
+                                  margin: AppEdgeInsets.instance.all(4),
+                                  padding: AppEdgeInsets.instance.all(4),
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    color: Colors.blue,
+                                    child: Text(
+                                      element,
+                                      style: AppTextStyle()
+                                          .regular16DolphinGrey
+                                          .copyWith(color: Colors.black),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
                               ),
-                              margin: AppEdgeInsets.instance.all(4),
-                              padding: AppEdgeInsets.instance.all(4),
-                              alignment: Alignment.center,
-                              child: Text(
-                                currentHintText,
-                                style: AppTextStyle()
-                                    .regular16DolphinGrey
-                                    .copyWith(color: Colors.black),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    )),
+                            ))
+                  ],
+                ),
+                // child: Align(
+                //   alignment: Alignment.centerLeft,
+                //   child: ScrollConfiguration(
+                //     behavior: RemoveScrollingGlowEffect(),
+                //     child: ListView.builder(
+                //       itemCount: _bottomNavTranslationController
+                //           .transliterationWordHints.length,
+                //       shrinkWrap: true,
+                //       scrollDirection: Axis.horizontal,
+                //       itemBuilder: (context, index) {
+                //         String currentHintText = _bottomNavTranslationController
+                //             .transliterationWordHints[index];
+                //         return GestureDetector(
+                //           onTap: () {
+                //             replaceTextWithTransliterationHint(currentHintText);
+                //           },
+                //           child: Container(
+                //             decoration: BoxDecoration(
+                //               borderRadius: BorderRadius.circular(4),
+                //               color: lilyWhite,
+                //             ),
+                //             margin: AppEdgeInsets.instance.all(4),
+                //             padding: AppEdgeInsets.instance.all(4),
+                //             alignment: Alignment.center,
+                //             child: Text(
+                //               currentHintText,
+                //               style: AppTextStyle()
+                //                   .regular16DolphinGrey
+                //                   .copyWith(color: Colors.black),
+                //               maxLines: 1,
+                //               overflow: TextOverflow.ellipsis,
+                //             ),
+                //           ),
+                //         );
+                //       },
+                //     ),
+                //   ),
+                // ),
               ),
             ),
           ),
@@ -680,7 +720,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   }
 
   void getTransliterationHints(String newText) {
-    _bottomNavTranslationController.cancelPreviousTransliterationRequest();
+    // _bottomNavTranslationController.cancelPreviousTransliterationRequest();
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
       if (_bottomNavTranslationController
