@@ -103,7 +103,7 @@ class LanguageModelController extends GetxController {
     }
   }
 
-  String getAvailableTransliterationModelsForLanguage(String languageCode) {
+  String? getAvailableTransliterationModelsForLanguage(String languageCode) {
     List<String> availableTransliterationModelsForSelectedLangInUIDefault = [];
     List<String> availableTransliterationModelsForSelectedLangInUI = [];
     bool isAtLeastOneDefaultModelTypeFound = false;
@@ -150,7 +150,9 @@ class LanguageModelController extends GetxController {
       for (var eachAvailableTransliterationModelData
           in availableTransliterationModels.data) {
         if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
-            languageCode) {
+                'en' &&
+            eachAvailableTransliterationModelData.languages[0].targetLanguage ==
+                languageCode) {
           availableTransliterationModelsForSelectedLangInUI
               .add(eachAvailableTransliterationModelData.modelId);
         }
@@ -158,12 +160,15 @@ class LanguageModelController extends GetxController {
     }
 
     //Either select default model (vakyansh for now) or any random model from the available list.
-    String transliterationModelIDToUse = isAtLeastOneDefaultModelTypeFound
+    String? transliterationModelIDToUse = isAtLeastOneDefaultModelTypeFound
         ? availableTransliterationModelsForSelectedLangInUIDefault[Random()
             .nextInt(availableTransliterationModelsForSelectedLangInUIDefault
                 .length)]
-        : availableTransliterationModelsForSelectedLangInUI[Random()
-            .nextInt(availableTransliterationModelsForSelectedLangInUI.length)];
+        : availableTransliterationModelsForSelectedLangInUI.isNotEmpty
+            ? availableTransliterationModelsForSelectedLangInUI[Random()
+                .nextInt(
+                    availableTransliterationModelsForSelectedLangInUI.length)]
+            : null;
     return transliterationModelIDToUse;
   }
 
