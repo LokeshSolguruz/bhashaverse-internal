@@ -47,6 +47,7 @@ class BottomNavTranslationController extends GetxController {
   RxInt currentDuration = 0.obs;
   File? targetLanAudioFile;
   RxList transliterationWordHints = [].obs;
+  String currentlyTypedWordForTransliteration = '';
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -171,15 +172,22 @@ class BottomNavTranslationController extends GetxController {
   }
 
   Future<void> getTransliterationOutput(String sourceText) async {
+    currentlyTypedWordForTransliteration = sourceText;
+    String? transliterationModelToUse =
+        _languageModelController.getAvailableTransliterationModelsForLanguage(
+            getSelectedSourceLangCode());
+    if (transliterationModelToUse == null ||
+        transliterationModelToUse.isEmpty) {
+      transliterationWordHints.clear();
+      return;
+    }
     var transliterationPayloadToSend = {};
     transliterationPayloadToSend['input'] = [
       {'source': sourceText}
     ];
 
     transliterationPayloadToSend['modelId'] =
-        transliterationPayloadToSend['modelId'] = _languageModelController
-            .getAvailableTransliterationModelsForLanguage(
-                getSelectedSourceLangCode());
+        transliterationPayloadToSend['modelId'] = transliterationModelToUse;
     transliterationPayloadToSend['task'] = 'transliteration';
     transliterationPayloadToSend['userId'] = null;
 
@@ -188,7 +196,10 @@ class BottomNavTranslationController extends GetxController {
 
     response?.when(
       success: (data) async {
-        transliterationWordHints.value = data['target'];
+        if (currentlyTypedWordForTransliteration == data['source']) {
+          transliterationWordHints.value = data['target'];
+          transliterationWordHints.add(currentlyTypedWordForTransliteration);
+        }
       },
       failure: (error) {
         showDefaultSnackbar(
@@ -418,5 +429,9 @@ class BottomNavTranslationController extends GetxController {
     if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
       await targetLanAudioFile?.delete();
     }
+  }
+
+  bool getIsTransliterationEnabled() {
+    return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
   }
 }
