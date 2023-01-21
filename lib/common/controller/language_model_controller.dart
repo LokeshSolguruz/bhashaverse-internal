@@ -28,6 +28,10 @@ class LanguageModelController extends GetxController {
   late SearchModel _availableTTSModels;
   SearchModel get availableTTSModels => _availableTTSModels;
 
+  late SearchModel _availableTransliterationModels;
+  SearchModel get availableTransliterationModels =>
+      _availableTransliterationModels;
+
   void calcAvailableSourceAndTargetLanguages(List<dynamic> allModelList) {
     // TODO: Handel when perticular model not available
     _availableASRModels = allModelList.firstWhere((eachTaskResponse) {
@@ -37,6 +41,9 @@ class LanguageModelController extends GetxController {
         eachTaskResponse['taskType'] == 'translation')['modelInstance'];
     _availableTTSModels = allModelList.firstWhere((eachTaskResponse) =>
         eachTaskResponse['taskType'] == 'tts')['modelInstance'];
+    _availableTransliterationModels = allModelList.firstWhere(
+        (eachTaskResponse) =>
+            eachTaskResponse['taskType'] == 'transliteration')['modelInstance'];
 
     //Retrieve ASR Models
     Set<String> availableASRModelLanguagesSet = {};
@@ -50,6 +57,14 @@ class LanguageModelController extends GetxController {
     for (Data eachTTSModel in _availableTTSModels.data) {
       availableTTSModelLanguagesSet
           .add(eachTTSModel.languages[0].sourceLanguage.toString());
+    }
+
+    //Retrieve transliteration Models
+    Set<String> availableTransliterationModelLanguagesSet = {};
+    for (Data eachTransliterationModel
+        in _availableTransliterationModels.data) {
+      availableTransliterationModelLanguagesSet
+          .add(eachTransliterationModel.languages[0].sourceLanguage.toString());
     }
 
     var availableTranslationModelsList = _availableTranslationModels.data;
@@ -86,6 +101,75 @@ class LanguageModelController extends GetxController {
           returnWhat: LanguageMap.nativeName,
           lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
     }
+  }
+
+  String? getAvailableTransliterationModelsForLanguage(String languageCode) {
+    List<String> availableTransliterationModelsForSelectedLangInUIDefault = [];
+    List<String> availableTransliterationModelsForSelectedLangInUI = [];
+    bool isAtLeastOneDefaultModelTypeFound = false;
+
+    List<String> availableSubmittersList = [];
+    for (var eachAvailableTransliterationModelData
+        in availableTransliterationModels.data) {
+      //using English as source language for now
+      if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
+              'en' &&
+          eachAvailableTransliterationModelData.languages[0].targetLanguage ==
+              languageCode) {
+        if (!availableSubmittersList.contains(
+            eachAvailableTransliterationModelData.name.toLowerCase())) {
+          availableSubmittersList
+              .add(eachAvailableTransliterationModelData.name.toLowerCase());
+        }
+      }
+    }
+    availableSubmittersList = availableSubmittersList.toSet().toList();
+
+    //Check any AI4Bharat model availability
+    String ai4BharatModelName = '';
+    for (var eachSubmitter in availableSubmittersList) {
+      if (eachSubmitter.toLowerCase().contains(APIConstants
+          .DEFAULT_MODEL_TYPES[APIConstants.TYPES_OF_MODELS_LIST[3]]!
+          .split(',')[1]
+          .toLowerCase())) {
+        ai4BharatModelName = eachSubmitter;
+      }
+    }
+
+    if (ai4BharatModelName.isNotEmpty) {
+      for (var eachAvailableTransliterationModelData
+          in availableTransliterationModels.data) {
+        if (eachAvailableTransliterationModelData.name.toLowerCase() ==
+            ai4BharatModelName.toLowerCase()) {
+          availableTransliterationModelsForSelectedLangInUIDefault
+              .add(eachAvailableTransliterationModelData.modelId);
+          isAtLeastOneDefaultModelTypeFound = true;
+        }
+      }
+    } else {
+      for (var eachAvailableTransliterationModelData
+          in availableTransliterationModels.data) {
+        if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
+                'en' &&
+            eachAvailableTransliterationModelData.languages[0].targetLanguage ==
+                languageCode) {
+          availableTransliterationModelsForSelectedLangInUI
+              .add(eachAvailableTransliterationModelData.modelId);
+        }
+      }
+    }
+
+    //Either select default model (vakyansh for now) or any random model from the available list.
+    String? transliterationModelIDToUse = isAtLeastOneDefaultModelTypeFound
+        ? availableTransliterationModelsForSelectedLangInUIDefault[Random()
+            .nextInt(availableTransliterationModelsForSelectedLangInUIDefault
+                .length)]
+        : availableTransliterationModelsForSelectedLangInUI.isNotEmpty
+            ? availableTransliterationModelsForSelectedLangInUI[Random()
+                .nextInt(
+                    availableTransliterationModelsForSelectedLangInUI.length)]
+            : null;
+    return transliterationModelIDToUse;
   }
 
   String getAvailableASRModelsForLanguage(String languageCode) {

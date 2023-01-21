@@ -94,19 +94,13 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
               _containerWidget(
                 widget: Obx(
                   () => CupertinoSwitch(
-                    value: _settingsController.isTransLiterationOn.value,
+                    value: _settingsController.isTransLiterationEnabled.value,
                     activeColor: japaneseLaurel,
                     trackColor: americanSilver,
                     onChanged: (value) {
-                      _settingsController.isTransLiterationOn.value = value;
-                      if (value) {
-                        showDefaultSnackbar(
-                            message: featureAvailableSoonInfo.tr);
-                        Future.delayed(const Duration(seconds: 2))
-                            .then((value) {
-                          _settingsController.isTransLiterationOn.value = false;
-                        });
-                      }
+                      _hiveDBInstance.put(enableTransliteration, value);
+                      _settingsController.isTransLiterationEnabled.value =
+                          value;
                     },
                   ),
                 ),

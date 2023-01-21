@@ -26,7 +26,8 @@ class BottomNavTranslation extends StatefulWidget {
   State<BottomNavTranslation> createState() => _BottomNavTranslationState();
 }
 
-class _BottomNavTranslationState extends State<BottomNavTranslation> {
+class _BottomNavTranslationState extends State<BottomNavTranslation>
+    with WidgetsBindingObserver {
   late BottomNavTranslationController _bottomNavTranslationController;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
@@ -36,8 +37,25 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
   void initState() {
     _bottomNavTranslationController = Get.find();
     _languageModelController = Get.find();
+    WidgetsBinding.instance.addObserver(this);
+
     ScreenUtil().init();
     super.initState();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final newValue = bottomInset > 0.0;
+    if (newValue != _bottomNavTranslationController.isKeyboardVisible.value) {
+      _bottomNavTranslationController.isKeyboardVisible.value = newValue;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -60,7 +78,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
             child: AnimatedContainer(
               decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                   border: Border.all(
                     color: americanSilver,
                   )),
@@ -102,7 +120,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                               ),
                             ),
                             SizedBox(height: 6.toHeight),
-                            // Source language tex field
+                            // Source language text field
                             Flexible(
                               child: TextField(
                                 controller: _bottomNavTranslationController
@@ -135,6 +153,16 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
                                 ),
+                                onChanged: (newText) {
+                                  if (_bottomNavTranslationController
+                                      .isTransliterationEnabled()) {
+                                    getTransliterationHints(newText);
+                                  } else {
+                                    _bottomNavTranslationController
+                                        .transliterationWordHints
+                                        .clear();
+                                  }
+                                },
                               ),
                             ),
                             SizedBox(height: 6.toHeight),
@@ -215,15 +243,99 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
               ),
             ),
           ),
+          SizedBox(
+            height: 8.toHeight,
+          ),
 
+          SizedBox(
+            height: 70.toHeight,
+            child: Obx(
+              () => Visibility(
+                visible:
+                    _bottomNavTranslationController.isKeyboardVisible.value,
+                child: Column(
+                  children: [
+                    SingleChildScrollView(
+                      controller: _bottomNavTranslationController
+                          .transliterationHintsScrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ..._bottomNavTranslationController
+                              .transliterationWordHints
+                              .map((hintText) => GestureDetector(
+                                    onTap: () {
+                                      replaceTextWithTransliterationHint(
+                                          hintText);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: lilyWhite,
+                                      ),
+                                      margin: AppEdgeInsets.instance.all(4),
+                                      padding: AppEdgeInsets.instance.symmetric(
+                                          vertical: 4, horizontal: 6),
+                                      alignment: Alignment.center,
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: (ScreenUtil.screenWidth / 6)
+                                              .toWidth,
+                                          // maxWidth: 300,
+                                        ),
+                                        child: Text(
+                                          hintText,
+                                          style: AppTextStyle()
+                                              .regular18DolphinGrey
+                                              .copyWith(
+                                                color: Colors.black,
+                                              ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: !_bottomNavTranslationController
+                              .isScrolledTransliterationHints.value &&
+                          _bottomNavTranslationController
+                              .transliterationWordHints.isNotEmpty,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Icon(
+                          Icons.arrow_forward_outlined,
+                          color: Colors.grey.shade400,
+                          size: 22.toHeight,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
           // language selection buttons
           SizedBox(
-            height: 35.toHeight,
+            height: 20.toHeight,
           ),
-          _buildSourceTargetLangButtons(),
+          Obx(
+            () => _bottomNavTranslationController.isKeyboardVisible.value
+                ? const SizedBox.shrink()
+                : _buildSourceTargetLangButtons(),
+          ),
 
           // mic button
-          _buildMicButton(),
+          Obx(
+            () => _bottomNavTranslationController.isKeyboardVisible.value
+                ? const SizedBox.shrink()
+                : _buildMicButton(),
+          ),
         ],
       ),
     );
@@ -301,6 +413,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
                       .selectedTargetLanguage.value) {
                 _bottomNavTranslationController.selectedTargetLanguage.value =
                     '';
+              }
+
+              if (_bottomNavTranslationController.isTransliterationEnabled()) {
+                _bottomNavTranslationController.setModelForTransliteration();
               }
             }
           },
@@ -596,6 +712,34 @@ class _BottomNavTranslationState extends State<BottomNavTranslation> {
         ),
       ],
     );
+  }
+
+  void getTransliterationHints(String newText) {
+    String wordToSend = newText.split(" ").last;
+    if (wordToSend.isNotEmpty) {
+      if (_bottomNavTranslationController
+          .selectedSourceLanguage.value.isNotEmpty) {
+        _bottomNavTranslationController.getTransliterationOutput(wordToSend);
+      }
+    } else {
+      _bottomNavTranslationController.clearTransliterationHints();
+    }
+  }
+
+  void replaceTextWithTransliterationHint(String currentHintText) {
+    List<String> oldString = _bottomNavTranslationController
+        .sourceLanTextController.text
+        .trim()
+        .split(' ');
+    oldString.removeLast();
+    oldString.add(currentHintText);
+    _bottomNavTranslationController.sourceLanTextController.text =
+        '${oldString.join(' ')} ';
+    _bottomNavTranslationController.sourceLanTextController.selection =
+        TextSelection.fromPosition(TextPosition(
+            offset: _bottomNavTranslationController
+                .sourceLanTextController.text.length));
+    _bottomNavTranslationController.clearTransliterationHints();
   }
 
   bool shouldShowWaveforms(bool isForTargetSection) {

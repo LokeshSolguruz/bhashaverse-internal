@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
-  RxBool isTransLiterationOn = false.obs;
+  RxBool isTransLiterationEnabled = true.obs;
   Rx<GenderEnum> selectedGender = (GenderEnum.male).obs;
   Rx<ThemeMode> selectedThemeMode = (ThemeMode.light).obs;
 }

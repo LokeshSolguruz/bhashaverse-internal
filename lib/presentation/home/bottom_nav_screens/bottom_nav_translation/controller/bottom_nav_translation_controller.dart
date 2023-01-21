@@ -8,6 +8,7 @@ import 'package:bhashaverse/utils/wavefrom_style.dart';
 import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:bhashaverse/enums/language_enum.dart';
 import 'package:bhashaverse/utils/voice_recorder.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,6 +29,9 @@ class BottomNavTranslationController extends GetxController {
   TextEditingController sourceLanTextController = TextEditingController();
   TextEditingController targetLangTextController = TextEditingController();
 
+  final ScrollController transliterationHintsScrollController =
+      ScrollController();
+
   RxBool isTranslateCompleted = false.obs;
   RxBool isMicButtonTapped = false.obs;
   bool isMicPermissionGranted = false;
@@ -39,11 +43,16 @@ class BottomNavTranslationController extends GetxController {
   RxBool isRecordedViaMic = false.obs;
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
+  RxBool isKeyboardVisible = false.obs;
   String sourcePath = '';
   String targetPath = '';
   RxInt maxDuration = 0.obs;
   RxInt currentDuration = 0.obs;
   File? targetLanAudioFile;
+  RxList transliterationWordHints = [].obs;
+  String? transliterationModelToUse = '';
+  String currentlyTypedWordForTransliteration = '';
+  RxBool isScrolledTransliterationHints = false.obs;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -85,6 +94,9 @@ class BottomNavTranslationController extends GetxController {
       }
     });
 
+    transliterationHintsScrollController.addListener(() {
+      isScrolledTransliterationHints.value = true;
+    });
     super.onInit();
   }
 
@@ -165,6 +177,44 @@ class BottomNavTranslationController extends GetxController {
     } else {
       await getASROutput(base64EncodedAudioContent);
     }
+  }
+
+  Future<void> getTransliterationOutput(String sourceText) async {
+    currentlyTypedWordForTransliteration = sourceText;
+    if (transliterationModelToUse == null ||
+        transliterationModelToUse!.isEmpty) {
+      clearTransliterationHints();
+      return;
+    }
+    var transliterationPayloadToSend = {};
+    transliterationPayloadToSend['input'] = [
+      {'source': sourceText}
+    ];
+
+    transliterationPayloadToSend['modelId'] =
+        transliterationPayloadToSend['modelId'] = transliterationModelToUse;
+    transliterationPayloadToSend['task'] = 'transliteration';
+    transliterationPayloadToSend['userId'] = null;
+
+    var response = await _translationAppAPIClient.sendTransliterationRequest(
+        transliterationPayload: transliterationPayloadToSend);
+
+    response?.when(
+      success: (data) async {
+        if (currentlyTypedWordForTransliteration ==
+            data['output'][0]['source']) {
+          transliterationWordHints.value = data['output'][0]['target'];
+          if (!transliterationWordHints
+              .contains(currentlyTypedWordForTransliteration)) {
+            transliterationWordHints.add(currentlyTypedWordForTransliteration);
+          }
+        }
+      },
+      failure: (error) {
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+      },
+    );
   }
 
   Future<void> getASROutput(String base64EncodedAudioContent) async {
@@ -323,6 +373,22 @@ class BottomNavTranslationController extends GetxController {
     }
   }
 
+  void setModelForTransliteration() {
+    transliterationModelToUse =
+        _languageModelController.getAvailableTransliterationModelsForLanguage(
+            getSelectedSourceLangCode());
+  }
+
+  void clearTransliterationHints() {
+    transliterationWordHints.clear();
+    currentlyTypedWordForTransliteration = '';
+  }
+
+  void cancelPreviousTransliterationRequest() {
+    _translationAppAPIClient.transliterationAPIcancelToken.cancel();
+    _translationAppAPIClient.transliterationAPIcancelToken = CancelToken();
+  }
+
   void resetAllValues() async {
     sourceLanTextController.clear();
     targetLangTextController.clear();
@@ -338,6 +404,10 @@ class BottomNavTranslationController extends GetxController {
     await stopPlayer();
     sourcePath = '';
     targetPath = '';
+    if (isTransliterationEnabled()) {
+      setModelForTransliteration();
+      clearTransliterationHints();
+    }
   }
 
   Future<void> prepareWaveforms(
@@ -383,5 +453,9 @@ class BottomNavTranslationController extends GetxController {
     if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
       await targetLanAudioFile?.delete();
     }
+  }
+
+  bool isTransliterationEnabled() {
+    return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
   }
 }

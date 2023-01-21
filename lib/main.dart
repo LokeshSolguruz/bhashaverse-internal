@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
     }
+    hiveDBInstance.put(enableTransliteration, true);
     return GetMaterialApp(
       title: appName.tr,
       debugShowCheckedModeBanner: false,
