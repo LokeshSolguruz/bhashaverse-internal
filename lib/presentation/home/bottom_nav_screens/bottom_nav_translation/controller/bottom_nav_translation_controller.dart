@@ -21,7 +21,7 @@ import '../../../../../utils/constants/app_constants.dart';
 import '../../../../../utils/permission_handler.dart';
 import '../../../../../utils/snackbar_utils.dart';
 import '../../../../../utils/voice_recorder.dart';
-import '../../../../../utils/wavefrom_style.dart';
+import '../../../../../utils/waveform_style.dart';
 
 class BottomNavTranslationController extends GetxController {
   late TranslationAppAPIClient _translationAppAPIClient;

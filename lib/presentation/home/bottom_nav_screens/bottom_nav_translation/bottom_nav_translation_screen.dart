@@ -14,7 +14,7 @@ import '../../../../utils/snackbar_utils.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
 import '../../../../utils/date_time_utils.dart';
-import '../../../../utils/wavefrom_style.dart';
+import '../../../../utils/waveform_style.dart';
 import 'controller/bottom_nav_translation_controller.dart';
 import 'widgets/mic_button.dart';
 
