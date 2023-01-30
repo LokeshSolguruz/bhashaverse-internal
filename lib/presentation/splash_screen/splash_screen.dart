@@ -6,37 +6,24 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_colors.dart';
-import 'controller/splash_controller.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
+  // @override
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  late SplashController _splashController;
-  late final Box _hiveDBInstance;
-  bool isIntroShownAlready = false;
-
-  @override
-  void initState() {
-    _splashController = Get.find();
-    _hiveDBInstance = Hive.box(hiveDBName);
-    isIntroShownAlready =
-        _hiveDBInstance.get(introShownAlreadyKey, defaultValue: false);
-    super.initState();
+  Widget build(BuildContext context) {
     ScreenUtil().init();
+
     Future.delayed(const Duration(seconds: 3)).then((value) {
+      final bool isIntroShownAlready =
+          Hive.box(hiveDBName).get(introShownAlreadyKey, defaultValue: false);
+
       Get.offNamed(isIntroShownAlready
           ? AppRoutes.homeRoute
           : AppRoutes.appLanguageRoute);
     });
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: flushOrangeColor,
       body: SafeArea(

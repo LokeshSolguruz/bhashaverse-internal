@@ -8,7 +8,7 @@ import 'package:hive_flutter/adapters.dart';
 
 import 'localization/app_localization.dart';
 import 'localization/localization_keys.dart';
-import 'presentation/splash_screen/binding/splash_binding.dart';
+import 'presentation/splash_screen/splash_screen.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants/app_constants.dart';
 import 'utils/theme/app_colors.dart';
@@ -52,8 +52,7 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
       ),
       getPages: AppRoutes.pages,
-      initialBinding: SplashBinding(),
-      initialRoute: AppRoutes.splashRoute,
+      home: const SplashScreen(),
     );
   }
 }
