@@ -38,7 +38,6 @@ class HomeController extends GetxController {
         await _translationAppAPIClient.getAllModels(taskPayloads: taskPayloads);
     allModelResponse.when(
       success: ((data) {
-        print('response success: $data');
         _languageModelController.calcAvailableSourceAndTargetLanguages(data);
         isModelsLoading.value = false;
       }),
