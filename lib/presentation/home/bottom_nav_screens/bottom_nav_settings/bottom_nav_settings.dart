@@ -260,7 +260,6 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     return Obx(
       () => PopupMenuButton(
         onSelected: (value) {
-          // _settingsController.selectedThemeMode.value = value;
           showDefaultSnackbar(message: featureAvailableSoonInfo.tr);
         },
         child: Row(
@@ -292,9 +291,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     );
   }
 
-  /// Get ThemeMode in string of given ThemeMode
   String _getThemeModeName(ThemeMode themeMode) {
-    //TODO: set return keys not translatedble
     switch (themeMode) {
       case ThemeMode.system:
         return systemDefault.tr;
