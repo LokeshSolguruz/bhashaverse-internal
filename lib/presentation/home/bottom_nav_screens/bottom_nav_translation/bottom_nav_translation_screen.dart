@@ -1,23 +1,22 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
+import '../../../../common/widgets/custom_plain_button.dart';
 import '../../../../localization/localization_keys.dart';
-import '../../../../routes/app_routes.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
+import '../../../../utils/snackbar_utils.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
 import '../../../../utils/date_time_utils.dart';
 import '../../../../utils/wavefrom_style.dart';
 import 'controller/bottom_nav_translation_controller.dart';
+import 'widgets/mic_button.dart';
 
 class BottomNavTranslation extends StatefulWidget {
   const BottomNavTranslation({super.key});
@@ -29,14 +28,12 @@ class BottomNavTranslation extends StatefulWidget {
 class _BottomNavTranslationState extends State<BottomNavTranslation>
     with WidgetsBindingObserver {
   late BottomNavTranslationController _bottomNavTranslationController;
-  late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _transLangFocusNode = FocusNode();
 
   @override
   void initState() {
     _bottomNavTranslationController = Get.find();
-    _languageModelController = Get.find();
     WidgetsBinding.instance.addObserver(this);
 
     ScreenUtil().init();
@@ -390,57 +387,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        InkWell(
-          onTap: () async {
-            _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
-
-            List<dynamic> sourceLanguageList =
-                _languageModelController.allAvailableSourceLanguages.toList();
-
-            dynamic selectedSourceLangIndex =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: sourceLanguageList,
-              kIsSourceLanguage: true
-            });
-            if (selectedSourceLangIndex != null) {
-              String selectedLanguage =
-                  sourceLanguageList[selectedSourceLangIndex];
-              _bottomNavTranslationController.selectedSourceLanguage.value =
-                  selectedLanguage;
-              if (selectedLanguage ==
-                  _bottomNavTranslationController
-                      .selectedTargetLanguage.value) {
-                _bottomNavTranslationController.selectedTargetLanguage.value =
-                    '';
-              }
-
-              if (_bottomNavTranslationController.isTransliterationEnabled()) {
-                _bottomNavTranslationController.setModelForTransliteration();
-              }
-            }
-          },
-          child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Obx(
-              () {
-                return Text(
-                  _bottomNavTranslationController
-                      .getSelectedSourceLanguageName(),
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(fontSize: 16.toFont),
-                );
-              },
-            ),
-          ),
+        Obx(
+          () => CustomPlainButton(
+              title: _bottomNavTranslationController
+                  .getSelectedSourceLanguageName(),
+              onTap: () async {
+                unFocusTextFields();
+                _bottomNavTranslationController.updateSourceLanguage();
+              }),
         ),
         GestureDetector(
           onTap: () {
@@ -452,50 +406,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             width: 32.toWidth,
           ),
         ),
-        InkWell(
-          onTap: () async {
-            _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
-
-            List<dynamic> targetLanguageList =
-                _languageModelController.allAvailableTargetLanguages.toList();
-
-            if (_bottomNavTranslationController
-                .selectedSourceLanguage.value.isNotEmpty) {
-              targetLanguageList.removeWhere((eachAvailableTargetLanguage) {
-                return eachAvailableTargetLanguage ==
-                    _bottomNavTranslationController
-                        .selectedSourceLanguage.value;
-              });
-            }
-
-            dynamic selectedTargetLangIndex =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: targetLanguageList,
-              kIsSourceLanguage: false
-            });
-            if (selectedTargetLangIndex != null) {
-              _bottomNavTranslationController.selectedTargetLanguage.value =
-                  targetLanguageList[selectedTargetLangIndex];
-            }
-          },
-          child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Obx(
-              () => Text(
-                _bottomNavTranslationController.getSelectedTargetLanguageName(),
-                style: AppTextStyle()
-                    .regular18DolphinGrey
-                    .copyWith(fontSize: 16.toFont),
-              ),
-            ),
-          ),
+        Obx(
+          () => CustomPlainButton(
+              title: _bottomNavTranslationController
+                  .getSelectedTargetLanguageName(),
+              onTap: () async {
+                unFocusTextFields();
+                _bottomNavTranslationController.updateTargetLanguage();
+              }),
         ),
       ],
     );
@@ -503,62 +421,20 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
 
   Widget _buildMicButton() {
     return Obx(
-      () => Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          AnimatedOpacity(
-            opacity:
-                _bottomNavTranslationController.isMicButtonTapped.value ? 1 : 0,
-            duration: const Duration(milliseconds: 600),
-            child: Padding(
-              padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
-              child: LottieBuilder.asset(
-                animationStaticWaveForRecording,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              if (_bottomNavTranslationController
-                  .isSourceAndTargetLangSelected()) {
-                unFocusTextFields();
-                if (!_bottomNavTranslationController.isMicButtonTapped.value) {
-                  _bottomNavTranslationController.startVoiceRecording();
-                } else {
-                  _bottomNavTranslationController
-                      .stopVoiceRecordingAndGetResult();
-                }
-              } else {
-                showDefaultSnackbar(
-                    message: kErrorSelectSourceAndTargetScreen.tr);
-              }
-            },
-            child: PhysicalModel(
-              color: Colors.transparent,
-              shape: BoxShape.circle,
-              elevation: 6,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: flushOrangeColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Padding(
-                  padding: AppEdgeInsets.instance.all(20.0),
-                  child: SvgPicture.asset(
-                    _bottomNavTranslationController.isMicButtonTapped.value
-                        ? iconMicStop
-                        : iconMicroPhone,
-                    height: 32.toHeight,
-                    width: 32.toWidth,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+      () => MicButton(
+        isRecording: _bottomNavTranslationController.isMicButtonTapped.value,
+        onTap: () {
+          if (_bottomNavTranslationController.isSourceAndTargetLangSelected()) {
+            unFocusTextFields();
+            if (!_bottomNavTranslationController.isMicButtonTapped.value) {
+              _bottomNavTranslationController.startVoiceRecording();
+            } else {
+              _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+            }
+          } else {
+            showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+          }
+        },
       ),
     );
   }
