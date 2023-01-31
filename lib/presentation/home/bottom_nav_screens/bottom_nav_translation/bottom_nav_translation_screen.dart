@@ -174,7 +174,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                         ),
                       ),
                       SizedBox(height: 6.toHeight),
-                      _buildInputActionButtons(),
                       Visibility(
                         visible: _bottomNavTranslationController
                             .isTranslateCompleted.value,
@@ -234,6 +233,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                           ),
                         ),
                       ),
+                      _buildInputActionButtons(),
                     ],
                   ),
                 ),
@@ -279,7 +279,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         constraints: BoxConstraints(
                                           minWidth: (ScreenUtil.screenWidth / 6)
                                               .toWidth,
-                                          // maxWidth: 300,
                                         ),
                                         child: Text(
                                           hintText,
