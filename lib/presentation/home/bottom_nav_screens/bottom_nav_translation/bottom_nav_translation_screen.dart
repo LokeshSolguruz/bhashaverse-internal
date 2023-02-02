@@ -248,7 +248,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           ),
 
           SizedBox(
-            height: 70.toHeight,
+            height: 75.toHeight,
             child: Obx(
               () => Visibility(
                 visible:
