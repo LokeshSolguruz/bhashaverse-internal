@@ -516,6 +516,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               child: LottieBuilder.asset(
                 animationStaticWaveForRecording,
                 fit: BoxFit.cover,
+                animate:
+                    _bottomNavTranslationController.isMicButtonTapped.value,
               ),
             ),
           ),
