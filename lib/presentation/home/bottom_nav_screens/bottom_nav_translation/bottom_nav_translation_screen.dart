@@ -134,6 +134,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     : AppTextStyle().regular28balticSea,
                                 expands: true,
                                 maxLines: null,
+                                textInputAction: TextInputAction.done,
                                 decoration: InputDecoration(
                                   hintText: _bottomNavTranslationController
                                           .isTranslateCompleted.value
@@ -218,6 +219,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         readOnly:
                                             _bottomNavTranslationController
                                                 .isTranslateCompleted.value,
+                                        textInputAction: TextInputAction.done,
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           isDense: true,
