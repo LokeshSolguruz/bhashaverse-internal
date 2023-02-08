@@ -1,22 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:bhashaverse/common/controller/language_model_controller.dart';
 import 'package:bhashaverse/enums/asr_details_enum.dart';
-import 'package:bhashaverse/enums/socket_io_event_enum.dart';
 import 'package:bhashaverse/services/socket_io_client.dart';
-import 'package:bhashaverse/utils/mic_streamer.dart';
 import 'package:bhashaverse/utils/wavefrom_style.dart';
 import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:bhashaverse/enums/language_enum.dart';
 import 'package:bhashaverse/utils/voice_recorder.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../../localization/localization_keys.dart';
@@ -57,22 +56,24 @@ class BottomNavTranslationController extends GetxController {
   String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
   RxBool isScrolledTransliterationHints = false.obs;
-  SocketIOClient? _socketIOClient;
+  late SocketIOClient _socketIOClient;
 
-  late MicStreamer micStreamer;
-  StreamSubscription<dynamic>? micResponseListener;
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
   late final Box _hiveDBInstance;
 
   late PlayerController controller;
 
+  StreamSubscription<Uint8List>? micStreamSubscription;
+
+  int silenceSize = 20;
+
   @override
   void onInit() {
+    _socketIOClient = Get.find();
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    _socketIOClient = SocketIOClient();
     controller = PlayerController();
 
     controller.onCompletion.listen((event) {
@@ -103,14 +104,14 @@ class BottomNavTranslationController extends GetxController {
     transliterationHintsScrollController.addListener(() {
       isScrolledTransliterationHints.value = true;
     });
-    micStreamer = Get.find();
     super.onInit();
+    ever(_socketIOClient.socketResponse,
+        (socketResponse) => sourceLanTextController.text = socketResponse);
   }
 
   @override
   void onClose() {
-    micResponseListener?.cancel();
-    _socketIOClient?.disconnect();
+    _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
     disposePlayer();
@@ -170,69 +171,90 @@ class BottomNavTranslationController extends GetxController {
       // / if user quickly released tap than [isMicButtonTapped] would be false
       //So need to check before starting mic streaming
       if (isMicButtonTapped.value == true) {
+        sourceLanTextController.clear;
         connectToSocket();
 
-        _socketIOClient?.socketEmit(
+        _socketIOClient.socketEmit(
             emittingStatus: 'connect_mic_stream',
             emittingData: [],
             isDataToSend: false);
 
-        micResponseListener =
-            _socketIOClient?.getResponseStream().listen((event) {
-          if (event['type'] == SocketIOEvent.connectSuccess) {
-            micStreamer.startMicStreaming();
-            ever(micStreamer.micData, ((event) {
-              if (event != Int32List(0)) {
-                _socketIOClient?.socketEmit(
-                    emittingStatus: 'mic_data',
-                    emittingData: [
-                      event,
-                      getSelectedSourceLangCode(),
-                      true,
-                      false
-                    ],
-                    isDataToSend: true);
-              } else {
-                _socketIOClient?.socketEmit(
-                    emittingStatus: 'mic_data',
-                    emittingData: [
-                      null,
-                      getSelectedSourceLangCode(),
-                      false,
-                      false
-                    ],
-                    isDataToSend: true);
+        Future.delayed(const Duration(milliseconds: 50)).then((_) {
+          MicStream.microphone(
+                  audioSource: AudioSource.DEFAULT,
+                  sampleRate: 44100,
+                  channelConfig: ChannelConfig.CHANNEL_IN_MONO,
+                  audioFormat: AudioFormat.ENCODING_PCM_16BIT)
+              .then((stream) {
+            List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
+            micStreamSubscription = stream?.listen((value) {
+              double meanSquared = meanSquare(value.buffer.asInt8List());
+              print('sending buffer');
+              _socketIOClient.socketEmit(
+                  emittingStatus: 'mic_data',
+                  emittingData: [
+                    value.buffer.asInt32List(),
+                    getSelectedSourceLangCode(),
+                    true,
+                    false
+                  ],
+                  isDataToSend: true);
+
+              if (meanSquared >= 0.3) {
+                checkSilenceList.add(0);
               }
-            }));
-          } else if (event['type'] == SocketIOEvent.streamResponse) {
-            sourceLanTextController.text = event['response'];
-          }
+              if (meanSquared < 0.3) {
+                checkSilenceList.add(1);
+
+                if (checkSilenceList.length > silenceSize) {
+                  checkSilenceList = checkSilenceList
+                      .sublist(checkSilenceList.length - silenceSize);
+                }
+                int sumValue = checkSilenceList
+                    .reduce((value, element) => value + element);
+                if (sumValue == silenceSize) {
+                  print('clearing buffer');
+                  _socketIOClient.socketEmit(
+                      emittingStatus: 'mic_data',
+                      emittingData: [
+                        null,
+                        getSelectedSourceLangCode(),
+                        false,
+                        false
+                      ],
+                      isDataToSend: true);
+                  checkSilenceList.clear();
+                }
+              }
+            });
+          });
         });
-
-        // REST API code
-        // clear previous recording files and
-        // update state
-        // resetAllValues();
-        // await _voiceRecorder.startRecordingVoice();
-
       }
+      // if (event['type'] == SocketIOEvent.streamResponse) {
+      //   sourceLanTextController.text = event['response'];
+      // }
+
+      // REST API code
+      // clear previous recording files and
+      // update state
+      // resetAllValues();
+      // await _voiceRecorder.startRecordingVoice();
+
     } else {
       showDefaultSnackbar(message: errorMicPermission.tr);
     }
   }
 
   void stopVoiceRecordingAndGetResult() async {
-    isMicButtonTapped.value = false;
-
-    print('stream close request');
-    micStreamer.clearMicStream();
-    micResponseListener?.cancel();
-    _socketIOClient?.disposeStream();
-    _socketIOClient?.socketEmit(
+    micStreamSubscription?.cancel();
+    _socketIOClient.socketEmit(
         emittingStatus: 'mic_data',
         emittingData: [null, getSelectedSourceLangCode(), false, true],
         isDataToSend: true);
-    _socketIOClient?.disconnect();
+    isMicButtonTapped.value = false;
+    Future.delayed(const Duration(seconds: 1)).then((_) {
+      _socketIOClient.disconnect();
+    });
 
     // REST API code
     // String? base64EncodedAudioContent =
@@ -528,8 +550,8 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void connectToSocket() {
-    if (_socketIOClient != null && _socketIOClient!.isConnected()) {
-      _socketIOClient?.disconnect();
+    if (_socketIOClient.isConnected()) {
+      _socketIOClient.disconnect();
     }
 
     String languageCode = getSelectedSourceLangCode();
@@ -537,7 +559,15 @@ class BottomNavTranslationController extends GetxController {
         _languageModelController.getAvailableASRModelsForLanguage(
             languageCode: languageCode,
             requiredASRDetails: ASRModelDetails.streamingCallbackURL);
-    _socketIOClient?.socketConnect(
+    _socketIOClient.socketConnect(
         apiCallbackURL: callbackURL, languageCode: languageCode);
+  }
+
+  double meanSquare(Int8List value) {
+    var sqrValue = 0;
+    for (int indValue in value) {
+      sqrValue = indValue * indValue;
+    }
+    return (sqrValue / value.length) * 1000;
   }
 }
