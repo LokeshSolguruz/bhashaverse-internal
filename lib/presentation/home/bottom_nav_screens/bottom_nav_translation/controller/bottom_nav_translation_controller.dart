@@ -4,6 +4,10 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:bhashaverse/common/controller/language_model_controller.dart';
+import 'package:bhashaverse/enums/asr_details_enum.dart';
+import 'package:bhashaverse/enums/socket_io_event_enum.dart';
+import 'package:bhashaverse/services/socket_io_client.dart';
+import 'package:bhashaverse/utils/mic_streamer.dart';
 import 'package:bhashaverse/utils/wavefrom_style.dart';
 import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:bhashaverse/enums/language_enum.dart';
@@ -53,7 +57,10 @@ class BottomNavTranslationController extends GetxController {
   String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
   RxBool isScrolledTransliterationHints = false.obs;
+  SocketIOClient? _socketIOClient;
 
+  late MicStreamer micStreamer;
+  StreamSubscription<dynamic>? micResponseListener;
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
   late final Box _hiveDBInstance;
@@ -65,7 +72,7 @@ class BottomNavTranslationController extends GetxController {
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-
+    _socketIOClient = SocketIOClient();
     controller = PlayerController();
 
     controller.onCompletion.listen((event) {
@@ -93,15 +100,17 @@ class BottomNavTranslationController extends GetxController {
         default:
       }
     });
-
     transliterationHintsScrollController.addListener(() {
       isScrolledTransliterationHints.value = true;
     });
+    micStreamer = Get.find();
     super.onInit();
   }
 
   @override
   void onClose() {
+    micResponseListener?.cancel();
+    _socketIOClient?.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
     disposePlayer();
@@ -152,15 +161,61 @@ class BottomNavTranslationController extends GetxController {
       lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
 
   void startVoiceRecording() async {
+    isMicButtonTapped.value = true;
+
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
       isMicPermissionGranted = isPermissionGranted;
     });
     if (isMicPermissionGranted) {
-      // clear previous recording files and
-      // update state
-      resetAllValues();
-      isMicButtonTapped.value = true;
-      await _voiceRecorder.startRecordingVoice();
+      // / if user quickly released tap than [isMicButtonTapped] would be false
+      //So need to check before starting mic streaming
+      if (isMicButtonTapped.value == true) {
+        connectToSocket();
+
+        _socketIOClient?.socketEmit(
+            emittingStatus: 'connect_mic_stream',
+            emittingData: [],
+            isDataToSend: false);
+
+        micResponseListener =
+            _socketIOClient?.getResponseStream().listen((event) {
+          if (event['type'] == SocketIOEvent.connectSuccess) {
+            micStreamer.startMicStreaming();
+            ever(micStreamer.micData, ((event) {
+              if (event != Int32List(0)) {
+                _socketIOClient?.socketEmit(
+                    emittingStatus: 'mic_data',
+                    emittingData: [
+                      event,
+                      getSelectedSourceLangCode(),
+                      true,
+                      false
+                    ],
+                    isDataToSend: true);
+              } else {
+                _socketIOClient?.socketEmit(
+                    emittingStatus: 'mic_data',
+                    emittingData: [
+                      null,
+                      getSelectedSourceLangCode(),
+                      false,
+                      false
+                    ],
+                    isDataToSend: true);
+              }
+            }));
+          } else if (event['type'] == SocketIOEvent.streamResponse) {
+            sourceLanTextController.text = event['response'];
+          }
+        });
+
+        // REST API code
+        // clear previous recording files and
+        // update state
+        // resetAllValues();
+        // await _voiceRecorder.startRecordingVoice();
+
+      }
     } else {
       showDefaultSnackbar(message: errorMicPermission.tr);
     }
@@ -168,15 +223,27 @@ class BottomNavTranslationController extends GetxController {
 
   void stopVoiceRecordingAndGetResult() async {
     isMicButtonTapped.value = false;
-    String? base64EncodedAudioContent =
-        await _voiceRecorder.stopRecordingVoiceAndGetOutput();
-    if (base64EncodedAudioContent == null ||
-        base64EncodedAudioContent.isEmpty) {
-      showDefaultSnackbar(message: errorInRecording.tr);
-      return;
-    } else {
-      await getASROutput(base64EncodedAudioContent);
-    }
+
+    print('stream close request');
+    micStreamer.clearMicStream();
+    micResponseListener?.cancel();
+    _socketIOClient?.disposeStream();
+    _socketIOClient?.socketEmit(
+        emittingStatus: 'mic_data',
+        emittingData: [null, getSelectedSourceLangCode(), false, true],
+        isDataToSend: true);
+    _socketIOClient?.disconnect();
+
+    // REST API code
+    // String? base64EncodedAudioContent =
+    //     await _voiceRecorder.stopRecordingVoiceAndGetOutput();
+    // if (base64EncodedAudioContent == null ||
+    //     base64EncodedAudioContent.isEmpty) {
+    //   showDefaultSnackbar(message: errorInRecording.tr);
+    //   return;
+    // } else {
+    //   await getASROutput(base64EncodedAudioContent);
+    // }
   }
 
   Future<void> getTransliterationOutput(String sourceText) async {
@@ -219,8 +286,10 @@ class BottomNavTranslationController extends GetxController {
   Future<void> getASROutput(String base64EncodedAudioContent) async {
     isLsLoading.value = true;
     var asrPayloadToSend = {};
-    asrPayloadToSend['modelId'] = _languageModelController
-        .getAvailableASRModelsForLanguage(getSelectedSourceLangCode());
+    asrPayloadToSend['modelId'] =
+        _languageModelController.getAvailableASRModelsForLanguage(
+            languageCode: getSelectedSourceLangCode(),
+            requiredASRDetails: ASRModelDetails.modelId);
     asrPayloadToSend['task'] = 'asr';
     asrPayloadToSend['audioContent'] = base64EncodedAudioContent;
     asrPayloadToSend['source'] = getSelectedSourceLangCode();
@@ -456,5 +525,19 @@ class BottomNavTranslationController extends GetxController {
 
   bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
+  }
+
+  void connectToSocket() {
+    if (_socketIOClient != null && _socketIOClient!.isConnected()) {
+      _socketIOClient?.disconnect();
+    }
+
+    String languageCode = getSelectedSourceLangCode();
+    String callbackURL =
+        _languageModelController.getAvailableASRModelsForLanguage(
+            languageCode: languageCode,
+            requiredASRDetails: ASRModelDetails.streamingCallbackURL);
+    _socketIOClient?.socketConnect(
+        apiCallbackURL: callbackURL, languageCode: languageCode);
   }
 }
