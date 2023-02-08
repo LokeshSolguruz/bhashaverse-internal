@@ -1,4 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/services/socket_io_client.dart';
 import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +30,7 @@ class BottomNavTranslation extends StatefulWidget {
 class _BottomNavTranslationState extends State<BottomNavTranslation>
     with WidgetsBindingObserver {
   late BottomNavTranslationController _bottomNavTranslationController;
+  late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _transLangFocusNode = FocusNode();
@@ -37,6 +39,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   void initState() {
     _bottomNavTranslationController = Get.find();
     _languageModelController = Get.find();
+    _socketIOClient = Get.find();
     WidgetsBinding.instance.addObserver(this);
 
     ScreenUtil().init();
@@ -139,10 +142,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   hintText: _bottomNavTranslationController
                                           .isTranslateCompleted.value
                                       ? null
-                                      : _bottomNavTranslationController
-                                              .isMicButtonTapped.value
+                                      : _socketIOClient.isMicConnected.value
                                           ? kListeningHintText.tr
-                                          : kTranslationHintText.tr,
+                                          : _bottomNavTranslationController
+                                                  .isMicButtonTapped.value
+                                              ? 'Connecting...'
+                                              : kTranslationHintText.tr,
                                   hintStyle: AppTextStyle()
                                       .regular28balticSea
                                       .copyWith(color: mischkaGrey),
@@ -510,16 +515,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         alignment: Alignment.center,
         children: [
           AnimatedOpacity(
-            opacity:
-                _bottomNavTranslationController.isMicButtonTapped.value ? 1 : 0,
+            opacity: _socketIOClient.isMicConnected.value ? 1 : 0,
             duration: const Duration(milliseconds: 600),
             child: Padding(
               padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
               child: LottieBuilder.asset(
                 animationStaticWaveForRecording,
                 fit: BoxFit.cover,
-                animate:
-                    _bottomNavTranslationController.isMicButtonTapped.value,
+                animate: _socketIOClient.isMicConnected.value,
               ),
             ),
           ),
