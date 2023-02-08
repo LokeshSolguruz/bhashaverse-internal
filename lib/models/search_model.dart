@@ -1,6 +1,6 @@
 class SearchModel {
   late String message;
-  late List<Data> data;
+  late List<SearchModelData> data;
   late int count;
 
   SearchModel({
@@ -12,9 +12,9 @@ class SearchModel {
   SearchModel.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <SearchModelData>[];
       json['data'].forEach((v) {
-        data.add(Data.fromJson(v));
+        data.add(SearchModelData.fromJson(v));
       });
     }
     count = json['count'];
@@ -29,8 +29,8 @@ class SearchModel {
   }
 }
 
-class Data {
-  Data({
+class SearchModelData {
+  SearchModelData({
     required this.name,
     required this.description,
     required this.refUrl,
@@ -54,7 +54,7 @@ class Data {
   late final String modelId;
   late final String userId;
 
-  Data.fromJson(Map<String, dynamic> json) {
+  SearchModelData.fromJson(Map<String, dynamic> json) {
     name = json['name'];
 
     description = json['description'];
