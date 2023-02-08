@@ -1,0 +1,4 @@
+enum SocketIOEvent {
+  connectSuccess,
+  streamResponse,
+}
