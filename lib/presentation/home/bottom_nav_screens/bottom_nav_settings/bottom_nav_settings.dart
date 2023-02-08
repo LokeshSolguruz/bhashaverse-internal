@@ -56,12 +56,12 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                     .copyWith(fontSize: 20.toFont),
               ),
               SizedBox(height: 48.toHeight),
-              _containerWidget(
-                widget: _popupMenuBuilder(),
-                title: appTheme.tr,
-                subtitle: appInterfaceWillChange.tr,
-              ),
-              SizedBox(height: 24.toHeight),
+              // _containerWidget(
+              //   widget: _popupMenuBuilder(),
+              //   title: appTheme.tr,
+              //   subtitle: appInterfaceWillChange.tr,
+              // ),
+              // SizedBox(height: 24.toHeight),
               InkWell(
                 onTap: () {
                   Get.toNamed(AppRoutes.appLanguageRoute)
@@ -107,18 +107,18 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                 title: transLiteration.tr,
                 subtitle: transLiterationWillInitiateWord.tr,
               ),
-              SizedBox(height: 24.toHeight),
-              Visibility(
-                visible: false,
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(10),
-                  child: _containerWidget(
-                    widget: SvgPicture.asset(iconArrowDown),
-                    title: advanceSettings.tr,
-                  ),
-                ),
-              ),
+              // SizedBox(height: 24.toHeight),
+              // Visibility(
+              //   visible: false,
+              //   child: InkWell(
+              //     onTap: () {},
+              //     borderRadius: BorderRadius.circular(10),
+              //     child: _containerWidget(
+              //       widget: SvgPicture.asset(iconArrowDown),
+              //       title: advanceSettings.tr,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
