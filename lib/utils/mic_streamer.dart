@@ -6,7 +6,7 @@ import 'package:mic_stream/mic_stream.dart';
 
 class MicStreamer extends GetxService {
   late Rx<Int32List> micData = Int32List(0).obs;
-  late StreamSubscription<Uint8List>? streamSub;
+  late StreamSubscription<Uint8List>? micStreamSubscription;
   int silenceSize = 20;
 
   startMicStreaming() async {
@@ -15,9 +15,9 @@ class MicStreamer extends GetxService {
             sampleRate: 44100,
             channelConfig: ChannelConfig.CHANNEL_IN_MONO,
             audioFormat: AudioFormat.ENCODING_PCM_16BIT)
-        .then((value) {
+        .then((stream) {
       List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
-      streamSub = value?.listen((value) {
+      micStreamSubscription = stream?.listen((value) {
         double meanSquared = meanSquare(value.buffer.asInt8List());
 
         micData.value = value.buffer.asInt32List();
@@ -36,6 +36,7 @@ class MicStreamer extends GetxService {
               checkSilenceList.reduce((value, element) => value + element);
           if (sumValue == silenceSize) {
             micData.value = Int32List(0);
+            checkSilenceList.clear();
           }
         }
       });
@@ -51,8 +52,7 @@ class MicStreamer extends GetxService {
   }
 
   void clearMicStream() async {
-    await streamSub?.cancel();
-    streamSub = null;
+    await micStreamSubscription?.cancel();
     micData.value = Int32List(0);
   }
 }
