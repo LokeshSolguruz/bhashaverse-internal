@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 import 'package:get/get.dart';
 
+import '../../enums/asr_details_enum.dart';
 import '../../enums/language_enum.dart';
 import '../../models/search_model.dart';
 import '../../utils/constants/api_constants.dart';
@@ -19,8 +20,8 @@ class LanguageModelController extends GetxController {
   RxList<dynamic> get allAvailableTargetLanguages =>
       SplayTreeSet.from(_allAvailableTargetLanguages).toList().obs;
 
-  late SearchModel _availableASRModels;
-  SearchModel get availableASRModels => _availableASRModels;
+  late List<SearchModelData> _availableASRModels;
+  List<SearchModelData> get availableASRModels => _availableASRModels;
 
   late SearchModel _availableTranslationModels;
   SearchModel get availableTranslationModels => _availableTranslationModels;
@@ -33,10 +34,15 @@ class LanguageModelController extends GetxController {
       _availableTransliterationModels;
 
   void calcAvailableSourceAndTargetLanguages(List<dynamic> allModelList) {
-    // TODO: Handel when perticular model not available
-    _availableASRModels = allModelList.firstWhere((eachTaskResponse) {
-      return eachTaskResponse['taskType'] == 'asr';
-    })['modelInstance'];
+    _availableASRModels = allModelList
+        .firstWhere((eachTaskResponse) {
+          return eachTaskResponse['taskType'] == 'asr';
+        })['modelInstance']
+        .data
+        .where((e) {
+          return e.inferenceEndPoint.modelProcessingType == 'streaming';
+        })
+        .toList();
     _availableTranslationModels = allModelList.firstWhere((eachTaskResponse) =>
         eachTaskResponse['taskType'] == 'translation')['modelInstance'];
     _availableTTSModels = allModelList.firstWhere((eachTaskResponse) =>
@@ -47,21 +53,23 @@ class LanguageModelController extends GetxController {
 
     //Retrieve ASR Models
     Set<String> availableASRModelLanguagesSet = {};
-    for (Data eachASRModel in _availableASRModels.data) {
-      availableASRModelLanguagesSet
-          .add(eachASRModel.languages[0].sourceLanguage.toString());
+    for (SearchModelData eachASRModel in availableASRModels) {
+      if (eachASRModel.inferenceEndPoint.modelProcessingType == 'streaming') {
+        availableASRModelLanguagesSet
+            .add(eachASRModel.languages[0].sourceLanguage.toString());
+      }
     }
 
     //Retrieve TTS Models
     Set<String> availableTTSModelLanguagesSet = {};
-    for (Data eachTTSModel in _availableTTSModels.data) {
+    for (SearchModelData eachTTSModel in _availableTTSModels.data) {
       availableTTSModelLanguagesSet
           .add(eachTTSModel.languages[0].sourceLanguage.toString());
     }
 
     //Retrieve transliteration Models
     Set<String> availableTransliterationModelLanguagesSet = {};
-    for (Data eachTransliterationModel
+    for (SearchModelData eachTransliterationModel
         in _availableTransliterationModels.data) {
       availableTransliterationModelLanguagesSet
           .add(eachTransliterationModel.languages[0].sourceLanguage.toString());
@@ -83,7 +91,8 @@ class LanguageModelController extends GetxController {
       }
     }
     Set<String> availableTransModelLangCombinationsSet = {};
-    for (Data eachTranslationModel in availableTranslationModelsList) {
+    for (SearchModelData eachTranslationModel
+        in availableTranslationModelsList) {
       availableTransModelLangCombinationsSet.add(
           '${eachTranslationModel.languages[0].sourceLanguage}-${eachTranslationModel.languages[0].targetLanguage}');
     }
@@ -172,13 +181,15 @@ class LanguageModelController extends GetxController {
     return transliterationModelIDToUse;
   }
 
-  String getAvailableASRModelsForLanguage(String languageCode) {
+  String getAvailableASRModelsForLanguage(
+      {required String languageCode,
+      required ASRModelDetails requiredASRDetails}) {
     List<String> availableASRModelsForSelectedLangInUIDefault = [];
     List<String> availableASRModelsForSelectedLangInUI = [];
     bool isAtLeastOneDefaultModelTypeFound = false;
 
     List<String> availableSubmittersList = [];
-    for (var eachAvailableASRModelData in availableASRModels.data) {
+    for (var eachAvailableASRModelData in availableASRModels) {
       if (eachAvailableASRModelData.languages[0].sourceLanguage ==
           languageCode) {
         if (!availableSubmittersList
@@ -217,14 +228,20 @@ class LanguageModelController extends GetxController {
       }
     }
 
-    // //Check AI4Bharat Stream model availability
-    // String ai4BharatStreamModelName = '';
-    // for (var eachSubmitter in availableSubmittersList) {
-    //   if (eachSubmitter.toLowerCase().contains(AppConstants.DEFAULT_MODEL_TYPES[AppConstants.TYPES_OF_MODELS_LIST[0]]!.split(',')[1].toLowerCase()) &&
-    //       eachSubmitter.toLowerCase().contains(AppConstants.DEFAULT_MODEL_TYPES[AppConstants.TYPES_OF_MODELS_LIST[0]]!.split(',')[3].toLowerCase())) {
-    //     ai4BharatStreamModelName = eachSubmitter;
-    //   }
-    // }
+    //Check AI4Bharat Stream model availability
+    String ai4BharatStreamModelName = '';
+    for (var eachSubmitter in availableSubmittersList) {
+      if (eachSubmitter.toLowerCase().contains(APIConstants
+              .DEFAULT_MODEL_TYPES[APIConstants.TYPES_OF_MODELS_LIST[0]]!
+              .split(',')[1]
+              .toLowerCase()) &&
+          eachSubmitter.toLowerCase().contains(APIConstants
+              .DEFAULT_MODEL_TYPES[APIConstants.TYPES_OF_MODELS_LIST[0]]!
+              .split(',')[3]
+              .toLowerCase())) {
+        ai4BharatStreamModelName = eachSubmitter;
+      }
+    }
 
     //Check any AI4Bharat model availability
     String ai4BharatModelName = '';
@@ -246,47 +263,47 @@ class LanguageModelController extends GetxController {
     }
 
     if (openAIModelName.isNotEmpty) {
-      for (var eachAvailableASRModelData in availableASRModels.data) {
+      for (var eachAvailableASRModelData in availableASRModels) {
         if (eachAvailableASRModelData.name.toLowerCase() ==
             openAIModelName.toLowerCase()) {
-          availableASRModelsForSelectedLangInUIDefault
-              .add(eachAvailableASRModelData.modelId);
+          availableASRModelsForSelectedLangInUIDefault.add(
+              getASRDetails(eachAvailableASRModelData, requiredASRDetails));
           isAtLeastOneDefaultModelTypeFound = true;
         }
       }
     } else if (ai4BharatBatchModelName.isNotEmpty) {
-      for (var eachAvailableASRModelData in availableASRModels.data) {
+      for (var eachAvailableASRModelData in availableASRModels) {
         if (eachAvailableASRModelData.name.toLowerCase() ==
             ai4BharatBatchModelName.toLowerCase()) {
-          availableASRModelsForSelectedLangInUIDefault
-              .add(eachAvailableASRModelData.modelId);
+          availableASRModelsForSelectedLangInUIDefault.add(
+              getASRDetails(eachAvailableASRModelData, requiredASRDetails));
           isAtLeastOneDefaultModelTypeFound = true;
         }
       }
-    }
-    // else if (ai4BharatStreamModelName.isNotEmpty) {
-    //   for (var eachAvailableASRModelData in _languageModelController.availableASRModels.data) {
-    //     if (eachAvailableASRModelData.name.toLowerCase() == ai4BharatStreamModelName.toLowerCase()) {
-    //       availableASRModelsForSelectedLangInUIDefault.add(eachAvailableASRModelData.modelId);
-    //       isAtLeastOneDefaultModelTypeFound = true;
-    //     }
-    //   }
-    // }
-    else if (ai4BharatModelName.isNotEmpty) {
-      for (var eachAvailableASRModelData in availableASRModels.data) {
+    } else if (ai4BharatStreamModelName.isNotEmpty) {
+      for (var eachAvailableASRModelData in availableASRModels) {
+        if (eachAvailableASRModelData.name.toLowerCase() ==
+            ai4BharatStreamModelName.toLowerCase()) {
+          availableASRModelsForSelectedLangInUIDefault.add(
+              getASRDetails(eachAvailableASRModelData, requiredASRDetails));
+          isAtLeastOneDefaultModelTypeFound = true;
+        }
+      }
+    } else if (ai4BharatModelName.isNotEmpty) {
+      for (var eachAvailableASRModelData in availableASRModels) {
         if (eachAvailableASRModelData.name.toLowerCase() ==
             ai4BharatModelName.toLowerCase()) {
-          availableASRModelsForSelectedLangInUIDefault
-              .add(eachAvailableASRModelData.modelId);
+          availableASRModelsForSelectedLangInUIDefault.add(
+              getASRDetails(eachAvailableASRModelData, requiredASRDetails));
           isAtLeastOneDefaultModelTypeFound = true;
         }
       }
     } else {
-      for (var eachAvailableASRModelData in availableASRModels.data) {
+      for (var eachAvailableASRModelData in availableASRModels) {
         if (eachAvailableASRModelData.languages[0].sourceLanguage ==
             languageCode) {
-          availableASRModelsForSelectedLangInUI
-              .add(eachAvailableASRModelData.modelId);
+          availableASRModelsForSelectedLangInUI.add(
+              getASRDetails(eachAvailableASRModelData, requiredASRDetails));
         }
       }
     }
@@ -417,5 +434,12 @@ class LanguageModelController extends GetxController {
         : availableTTSModelsForSelectedLangInUI[
             Random().nextInt(availableTTSModelsForSelectedLangInUI.length)];
     return ttsModelIDToUse;
+  }
+
+  String getASRDetails(
+      SearchModelData asrModelData, ASRModelDetails requiredDetails) {
+    return requiredDetails == ASRModelDetails.modelId
+        ? asrModelData.modelId
+        : asrModelData.inferenceEndPoint.callbackUrl ?? '';
   }
 }
