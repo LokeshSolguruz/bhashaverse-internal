@@ -1,11 +1,10 @@
-import 'dart:async';
-
-import 'package:bhashaverse/enums/socket_io_event_enum.dart';
+import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
-class SocketIOClient {
+class SocketIOClient extends GetxService {
   Socket? _socket;
-  StreamController<dynamic> _responseStream = StreamController();
+  RxBool isMicConnected = false.obs;
+  RxString socketResponse = ''.obs;
 
   void socketEmit(
       {required String emittingStatus,
@@ -38,37 +37,33 @@ class SocketIOClient {
 
   void disconnect() {
     _socket?.close();
+    isMicConnected.value = false;
   }
 
   void setSocketMethods() {
     _socket?.onConnect((receivedData) {});
 
     _socket?.on('connect-success', (data) {
-      _responseStream.sink.add({'type': SocketIOEvent.connectSuccess});
+      isMicConnected.value = true;
     });
 
     _socket?.on('response', (data) {
-      if (data[0].isNotEmpty) {
-        _responseStream.sink
-            .add({'type': SocketIOEvent.streamResponse, 'response': data[0]});
+      print('socket: $data');
+      if (data is List && data.isNotEmpty && data[0].isNotEmpty) {
+        socketResponse.value = data[0];
       }
     });
 
-    _socket?.on('terminate', (data) {});
+    _socket?.on('terminate', (data) {
+      isMicConnected.value = false;
+    });
 
-    _socket?.onDisconnect((data) {});
+    _socket?.onDisconnect((data) {
+      isMicConnected.value = false;
+    });
   }
 
   bool isConnected() {
     return _socket != null && _socket!.connected;
-  }
-
-  Stream<dynamic> getResponseStream() {
-    return _responseStream.stream;
-  }
-
-  void disposeStream() {
-    _responseStream.close();
-    _responseStream = StreamController();
   }
 }
