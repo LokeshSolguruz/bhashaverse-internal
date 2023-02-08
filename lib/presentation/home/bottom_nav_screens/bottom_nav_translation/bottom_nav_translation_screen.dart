@@ -524,21 +524,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             ),
           ),
           GestureDetector(
-            onTap: () {
-              if (_bottomNavTranslationController
-                  .isSourceAndTargetLangSelected()) {
-                unFocusTextFields();
-                if (!_bottomNavTranslationController.isMicButtonTapped.value) {
-                  _bottomNavTranslationController.startVoiceRecording();
-                } else {
-                  _bottomNavTranslationController
-                      .stopVoiceRecordingAndGetResult();
-                }
-              } else {
-                showDefaultSnackbar(
-                    message: kErrorSelectSourceAndTargetScreen.tr);
-              }
-            },
+            onTapDown: (_) => micButtonActions(startMicRecording: true),
+            onTapUp: (_) => micButtonActions(startMicRecording: false),
+            onTapCancel: () => micButtonActions(startMicRecording: false),
+            onPanEnd: (_) => micButtonActions(startMicRecording: false),
             child: PhysicalModel(
               color: Colors.transparent,
               shape: BoxShape.circle,
@@ -756,5 +745,19 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   void unFocusTextFields() {
     _sourceLangFocusNode.unfocus();
     _transLangFocusNode.unfocus();
+  }
+
+  void micButtonActions({required bool startMicRecording}) {
+    if (_bottomNavTranslationController.isSourceAndTargetLangSelected()) {
+      unFocusTextFields();
+
+      if (startMicRecording) {
+        _bottomNavTranslationController.startVoiceRecording();
+      } else {
+        _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+      }
+    } else {
+      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+    }
   }
 }
