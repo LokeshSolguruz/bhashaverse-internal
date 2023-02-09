@@ -106,7 +106,8 @@ class BottomNavTranslationController extends GetxController {
     });
     super.onInit();
     ever(_socketIOClient.socketResponse,
-        (socketResponse) => sourceLanTextController.text = socketResponse);
+        (socketResponse) => sourceLanTextController.text = socketResponse,
+        condition: _socketIOClient.isMicConnected);
   }
 
   @override
@@ -189,7 +190,6 @@ class BottomNavTranslationController extends GetxController {
             List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
             micStreamSubscription = stream?.listen((value) {
               double meanSquared = meanSquare(value.buffer.asInt8List());
-              print('sending buffer');
               _socketIOClient.socketEmit(
                   emittingStatus: 'mic_data',
                   emittingData: [
@@ -213,7 +213,6 @@ class BottomNavTranslationController extends GetxController {
                 int sumValue = checkSilenceList
                     .reduce((value, element) => value + element);
                 if (sumValue == silenceSize) {
-                  print('clearing buffer');
                   _socketIOClient.socketEmit(
                       emittingStatus: 'mic_data',
                       emittingData: [
