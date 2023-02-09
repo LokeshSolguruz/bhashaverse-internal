@@ -68,6 +68,8 @@ class BottomNavTranslationController extends GetxController {
 
   int silenceSize = 20;
 
+  late Worker worker;
+
   @override
   void onInit() {
     _socketIOClient = Get.find();
@@ -105,13 +107,17 @@ class BottomNavTranslationController extends GetxController {
       isScrolledTransliterationHints.value = true;
     });
     super.onInit();
-    ever(_socketIOClient.socketResponse,
-        (socketResponse) => sourceLanTextController.text = socketResponse,
-        condition: _socketIOClient.isMicConnected);
+    worker = ever(_socketIOClient.socketResponseText, (socketResponseText) {
+      sourceLanTextController.text = socketResponseText;
+      if (!_socketIOClient.isMicConnected.value) {
+        worker.dispose();
+      }
+    }, condition: () => _socketIOClient.isMicConnected.value);
   }
 
   @override
   void onClose() {
+    worker.dispose();
     _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
@@ -180,58 +186,53 @@ class BottomNavTranslationController extends GetxController {
             emittingData: [],
             isDataToSend: false);
 
-        Future.delayed(const Duration(milliseconds: 50)).then((_) {
-          MicStream.microphone(
-                  audioSource: AudioSource.DEFAULT,
-                  sampleRate: 44100,
-                  channelConfig: ChannelConfig.CHANNEL_IN_MONO,
-                  audioFormat: AudioFormat.ENCODING_PCM_16BIT)
-              .then((stream) {
-            List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
-            micStreamSubscription = stream?.listen((value) {
-              double meanSquared = meanSquare(value.buffer.asInt8List());
-              _socketIOClient.socketEmit(
-                  emittingStatus: 'mic_data',
-                  emittingData: [
-                    value.buffer.asInt32List(),
-                    getSelectedSourceLangCode(),
-                    true,
-                    false
-                  ],
-                  isDataToSend: true);
+        MicStream.microphone(
+                audioSource: AudioSource.DEFAULT,
+                sampleRate: 44100,
+                channelConfig: ChannelConfig.CHANNEL_IN_MONO,
+                audioFormat: AudioFormat.ENCODING_PCM_16BIT)
+            .then((stream) {
+          List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
+          micStreamSubscription = stream?.listen((value) {
+            double meanSquared = meanSquare(value.buffer.asInt8List());
+            _socketIOClient.socketEmit(
+                emittingStatus: 'mic_data',
+                emittingData: [
+                  value.buffer.asInt32List(),
+                  getSelectedSourceLangCode(),
+                  true,
+                  false
+                ],
+                isDataToSend: true);
 
-              if (meanSquared >= 0.3) {
-                checkSilenceList.add(0);
-              }
-              if (meanSquared < 0.3) {
-                checkSilenceList.add(1);
+            if (meanSquared >= 0.3) {
+              checkSilenceList.add(0);
+            }
+            if (meanSquared < 0.3) {
+              checkSilenceList.add(1);
 
-                if (checkSilenceList.length > silenceSize) {
-                  checkSilenceList = checkSilenceList
-                      .sublist(checkSilenceList.length - silenceSize);
-                }
-                int sumValue = checkSilenceList
-                    .reduce((value, element) => value + element);
-                if (sumValue == silenceSize) {
-                  _socketIOClient.socketEmit(
-                      emittingStatus: 'mic_data',
-                      emittingData: [
-                        null,
-                        getSelectedSourceLangCode(),
-                        false,
-                        false
-                      ],
-                      isDataToSend: true);
-                  checkSilenceList.clear();
-                }
+              if (checkSilenceList.length > silenceSize) {
+                checkSilenceList = checkSilenceList
+                    .sublist(checkSilenceList.length - silenceSize);
               }
-            });
+              int sumValue =
+                  checkSilenceList.reduce((value, element) => value + element);
+              if (sumValue == silenceSize) {
+                _socketIOClient.socketEmit(
+                    emittingStatus: 'mic_data',
+                    emittingData: [
+                      null,
+                      getSelectedSourceLangCode(),
+                      false,
+                      false
+                    ],
+                    isDataToSend: true);
+                checkSilenceList.clear();
+              }
+            }
           });
         });
       }
-      // if (event['type'] == SocketIOEvent.streamResponse) {
-      //   sourceLanTextController.text = event['response'];
-      // }
 
       // REST API code
       // clear previous recording files and
@@ -251,9 +252,8 @@ class BottomNavTranslationController extends GetxController {
         emittingData: [null, getSelectedSourceLangCode(), false, true],
         isDataToSend: true);
     isMicButtonTapped.value = false;
-    Future.delayed(const Duration(seconds: 1)).then((_) {
-      _socketIOClient.disconnect();
-    });
+
+    _socketIOClient.disconnect();
 
     // REST API code
     // String? base64EncodedAudioContent =
