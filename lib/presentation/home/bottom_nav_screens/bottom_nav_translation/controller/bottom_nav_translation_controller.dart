@@ -287,8 +287,7 @@ class BottomNavTranslationController extends GetxController {
       {'source': sourceText}
     ];
 
-    transliterationPayloadToSend['modelId'] =
-        transliterationPayloadToSend['modelId'] = transliterationModelToUse;
+    transliterationPayloadToSend['modelId'] = transliterationModelToUse;
     transliterationPayloadToSend['task'] = 'transliteration';
     transliterationPayloadToSend['userId'] = null;
 
