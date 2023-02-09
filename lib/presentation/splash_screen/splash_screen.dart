@@ -6,7 +6,6 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_colors.dart';
-import 'controller/splash_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,13 +15,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late SplashController _splashController;
   late final Box _hiveDBInstance;
   bool isIntroShownAlready = false;
 
   @override
   void initState() {
-    _splashController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     isIntroShownAlready =
         _hiveDBInstance.get(introShownAlreadyKey, defaultValue: false);

@@ -1,6 +1,8 @@
-import 'package:bhashaverse/utils/screen_util/screen_util.dart';
-import 'package:bhashaverse/utils/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/screen_util/screen_util.dart';
+
+import 'app_colors.dart';
 
 class AppTextStyle {
   final light16BalticSea = TextStyle(

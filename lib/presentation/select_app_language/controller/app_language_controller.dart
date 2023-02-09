@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:bhashaverse/utils/constants/api_constants.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
+import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 
 class AppLanguageController extends GetxController {

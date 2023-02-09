@@ -1,5 +1,3 @@
-import 'package:bhashaverse/routes/app_routes.dart';
-import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,9 +7,11 @@ import 'package:hive/hive.dart';
 import '../../../../enums/gender_enum.dart';
 import '../../../../enums/language_enum.dart';
 import '../../../../localization/localization_keys.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../../utils/constants/api_constants.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
+import '../../../../utils/snackbar_utils.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
 import 'controller/settings_controller.dart';
@@ -292,9 +292,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     );
   }
 
-  /// Get ThemeMode in string of given ThemeMode
   String _getThemeModeName(ThemeMode themeMode) {
-    //TODO: set return keys not translatedble
     switch (themeMode) {
       case ThemeMode.system:
         return systemDefault.tr;
