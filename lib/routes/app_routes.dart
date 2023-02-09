@@ -1,16 +1,17 @@
-import 'package:bhashaverse/presentation/home/home_screen/binding/home_binding.dart';
-import 'package:bhashaverse/presentation/home/home_screen/home_screen.dart';
-import 'package:bhashaverse/presentation/home/language_selection/binding/language_selection_binding.dart';
-import 'package:bhashaverse/presentation/home/language_selection/language_selection_screen.dart';
-import 'package:bhashaverse/presentation/onboarding/binding/onboarding_binding.dart';
-import 'package:bhashaverse/presentation/onboarding/onboarding_screen.dart';
-import 'package:bhashaverse/presentation/select_app_language/binding/app_language_binding.dart';
-import 'package:bhashaverse/presentation/select_app_language/app_language.dart';
-import 'package:bhashaverse/presentation/select_voice_assistant/binding/voice_assistant_binding.dart';
-import 'package:bhashaverse/presentation/select_voice_assistant/voice_assistant_screen.dart';
-import 'package:bhashaverse/presentation/splash_screen/binding/splash_binding.dart';
-import 'package:bhashaverse/presentation/splash_screen/splash_screen.dart';
 import 'package:get/get.dart';
+
+import '../presentation/home/home_screen/binding/home_binding.dart';
+import '../presentation/home/home_screen/home_screen.dart';
+import '../presentation/home/language_selection/binding/language_selection_binding.dart';
+import '../presentation/home/language_selection/language_selection_screen.dart';
+import '../presentation/onboarding/binding/onboarding_binding.dart';
+import '../presentation/onboarding/onboarding_screen.dart';
+import '../presentation/select_app_language/binding/app_language_binding.dart';
+import '../presentation/select_app_language/app_language.dart';
+import '../presentation/select_voice_assistant/binding/voice_assistant_binding.dart';
+import '../presentation/select_voice_assistant/voice_assistant_screen.dart';
+import '../presentation/splash_screen/binding/splash_binding.dart';
+import '../presentation/splash_screen/splash_screen.dart';
 
 class AppRoutes {
   static String homeRoute = '/home_route';

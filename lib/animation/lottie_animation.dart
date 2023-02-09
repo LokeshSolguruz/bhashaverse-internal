@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:bhashaverse/utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../utils/screen_util/screen_util.dart';
 import '../utils/theme/app_colors.dart';
 import '../utils/theme/app_text_style.dart';
 

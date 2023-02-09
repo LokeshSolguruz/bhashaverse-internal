@@ -1,7 +1,7 @@
-import 'package:bhashaverse/localization/hi.dart';
 import 'package:get/get.dart';
 
 import 'en.dart';
+import 'hi.dart';
 
 class AppLocalization extends Translations {
   @override

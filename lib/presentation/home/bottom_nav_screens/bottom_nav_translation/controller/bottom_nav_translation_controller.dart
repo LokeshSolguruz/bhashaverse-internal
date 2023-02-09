@@ -3,11 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:bhashaverse/common/controller/language_model_controller.dart';
-import 'package:bhashaverse/utils/wavefrom_style.dart';
-import 'package:bhashaverse/enums/gender_enum.dart';
-import 'package:bhashaverse/enums/language_enum.dart';
-import 'package:bhashaverse/utils/voice_recorder.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +10,17 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../../../common/controller/language_model_controller.dart';
+import '../../../../../enums/gender_enum.dart';
+import '../../../../../enums/language_enum.dart';
 import '../../../../../localization/localization_keys.dart';
 import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
 import '../../../../../utils/permission_handler.dart';
 import '../../../../../utils/snackbar_utils.dart';
+import '../../../../../utils/voice_recorder.dart';
+import '../../../../../utils/waveform_style.dart';
 
 class BottomNavTranslationController extends GetxController {
   late TranslationAppAPIClient _translationAppAPIClient;

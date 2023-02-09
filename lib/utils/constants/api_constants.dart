@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
-import 'package:bhashaverse/enums/language_enum.dart';
+import '../../enums/language_enum.dart';
 
 class APIConstants {
   static const String ASR_CALLBACK_AZURE_URL =
@@ -124,20 +124,6 @@ class APIConstants {
                   value.toLowerCase());
           return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
       }
-
-      // if (returnWhat == LanguageMap.languageCode) {
-      //   var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
-      //       (eachLanguageCodeNamePair) =>
-      //           eachLanguageCodeNamePair[kDevanagariName]!.toLowerCase() ==
-      //           value.toLowerCase());
-      //   return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
-      // }
-
-      // var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
-      //     (eachLanguageCodeNamePair) =>
-      //         eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
-      //         value.toLowerCase());
-      // return returningLangPair[kDevanagariName] ?? 'No Language Name Found';
     } catch (e) {
       return 'No Language Found';
     }

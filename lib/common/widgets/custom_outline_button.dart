@@ -1,4 +1,4 @@
-import 'package:bhashaverse/utils/screen_util/screen_util.dart';
+import '../../utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

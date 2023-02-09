@@ -1,9 +1,9 @@
-import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:get/get.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../services/translation_app_api_client.dart';
 import '../../../../utils/constants/api_constants.dart';
+import '../../../../utils/snackbar_utils.dart';
 
 class HomeController extends GetxController {
   RxInt bottomBarIndex = 0.obs;
