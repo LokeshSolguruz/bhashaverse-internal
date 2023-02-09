@@ -178,7 +178,7 @@ class BottomNavTranslationController extends GetxController {
       // / if user quickly released tap than [isMicButtonTapped] would be false
       //So need to check before starting mic streaming
       if (isMicButtonTapped.value == true) {
-        sourceLanTextController.clear;
+        sourceLanTextController.clear();
         connectToSocket();
 
         _socketIOClient.socketEmit(
