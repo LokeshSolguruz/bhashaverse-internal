@@ -4,7 +4,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 class SocketIOClient extends GetxService {
   Socket? _socket;
   RxBool isMicConnected = false.obs;
-  RxString socketResponse = ''.obs;
+  RxString socketResponseText = ''.obs;
 
   void socketEmit(
       {required String emittingStatus,
@@ -48,9 +48,8 @@ class SocketIOClient extends GetxService {
     });
 
     _socket?.on('response', (data) {
-      print('socket: $data');
       if (data is List && data.isNotEmpty && data[0].isNotEmpty) {
-        socketResponse.value = data[0];
+        socketResponseText.value = data[0];
       }
     });
 
