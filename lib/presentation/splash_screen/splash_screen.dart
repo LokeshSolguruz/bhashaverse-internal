@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 import '../../routes/app_routes.dart';
-import 'controller/splash_controller.dart';
+import '../../utils/constants/app_constants.dart';
+import '../../utils/screen_util/screen_util.dart';
+import '../../utils/theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,23 +15,34 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late SplashController _splashController;
+  late final Box _hiveDBInstance;
+  bool isIntroShownAlready = false;
 
   @override
   void initState() {
-    _splashController = Get.find();
+    _hiveDBInstance = Hive.box(hiveDBName);
+    isIntroShownAlready =
+        _hiveDBInstance.get(introShownAlreadyKey, defaultValue: false);
     super.initState();
+    ScreenUtil().init();
     Future.delayed(const Duration(seconds: 3)).then((value) {
-      Get.offNamed(AppRoutes.homeRoute);
+      Get.offNamed(isIntroShownAlready
+          ? AppRoutes.homeRoute
+          : AppRoutes.appLanguageRoute);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: flushOrangeColor,
       body: SafeArea(
         child: Center(
-          child: Text('Welcome'),
+          child: Image.asset(
+            imgAppLogoSmall,
+            height: 100.toHeight,
+            width: 100.toWidth,
+          ),
         ),
       ),
     );

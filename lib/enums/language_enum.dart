@@ -1,4 +1,5 @@
 enum LanguageMap {
-  languageName,
+  nativeName,
+  englishName,
   languageCode,
 }

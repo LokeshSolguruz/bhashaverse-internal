@@ -1,8 +1,8 @@
-import 'package:bhashaverse/utils/constants/api_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/search_model.dart';
+import '../utils/constants/api_constants.dart';
 import 'data_source_manager/exception/app_exceptions.dart';
 import 'data_source_manager/models/api_result.dart';
 import 'network_error.dart';
@@ -16,6 +16,8 @@ class TranslationAppAPIClient {
     _dio = dio;
   }
 
+  CancelToken transliterationAPIcancelToken = CancelToken();
+
   static TranslationAppAPIClient getAPIClientInstance() {
     var options = BaseOptions(
       baseUrl: APIConstants.STS_BASE_URL,
@@ -23,8 +25,17 @@ class TranslationAppAPIClient {
       receiveTimeout: 50000,
     );
 
-    translationAppAPIClient =
-        translationAppAPIClient ?? TranslationAppAPIClient(Dio(options));
+    translationAppAPIClient = translationAppAPIClient ??
+        TranslationAppAPIClient(Dio(options)
+          ..interceptors.addAll(
+            [
+              if (kDebugMode)
+                LogInterceptor(
+                  responseBody: true,
+                  requestBody: true,
+                ),
+            ],
+          ));
     return translationAppAPIClient!;
   }
 
@@ -33,6 +44,7 @@ class TranslationAppAPIClient {
     try {
       final asrTranslationTtsResponses =
           await Future.wait(taskPayloads.map((eachTaskPayload) {
+        /// TODO: Handel when perticular model not available
         return _dio.post(APIConstants.SEARCH_REQ_URL, data: eachTaskPayload);
       }));
 
@@ -61,6 +73,32 @@ class TranslationAppAPIClient {
     }
   }
 
+  Future<Result<AppException, dynamic>?> sendTransliterationRequest(
+      {required transliterationPayload}) async {
+    try {
+      var response = await _dio.post(
+        APIConstants.TRANSLITERATION_REQ_URL,
+        data: transliterationPayload,
+        options: Options(
+            headers: {'Content-Type': 'application/json', 'Accept': '*/*'}),
+        // cancelToken: transliterationAPIcancelToken,
+      );
+      return Result.success(response.data);
+    } on DioError catch (error) {
+      if (error.type != DioErrorType.cancel) {
+        return Result.failure(
+            AppException(NetworkError(error).getErrorModel().errorMessage));
+      } else {
+        return null;
+      }
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print('Other Exception::: ${error.toString()}');
+      }
+      return Result.failure(AppException('Something went wrong'));
+    }
+  }
+
   Future<Result<AppException, dynamic>> sendASRRequest(
       {required asrPayload}) async {
     try {
@@ -80,18 +118,22 @@ class TranslationAppAPIClient {
     }
   }
 
-  Future<dynamic> sendTranslationRequest({required transPayload}) async {
+  Future<Result<AppException, dynamic>> sendTranslationRequest(
+      {required transPayload}) async {
     try {
       var response = await _dio.post(APIConstants.TRANS_REQ_URL,
           data: transPayload,
           options: Options(
               headers: {'Content-Type': 'application/json', 'Accept': '*/*'}));
-      if (response.statusCode == 200) {
-        return response.data;
+      return Result.success(response.data['output'][0]);
+    } on DioError catch (error) {
+      return Result.failure(
+          AppException(NetworkError(error).getErrorModel().errorMessage));
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print('Other Exception::: ${error.toString()}');
       }
-      return {};
-    } catch (e) {
-      return {};
+      return Result.failure(AppException('Something went wrong'));
     }
   }
 
@@ -110,16 +152,21 @@ class TranslationAppAPIClient {
     }
   }
 
-  Future<dynamic> sendTTSReqForBothGender(
+  Future<Result<AppException, dynamic>> sendTTSReqTranslation(
       {required List<dynamic> ttsPayloadList}) async {
     try {
-      final ttsResponsesList = await Future.wait(ttsPayloadList.map(
-          (eachTaskPayload) => _dio.post(APIConstants.TTS_REQ_URL,
-              data: eachTaskPayload,
-              options: Options(headers: {
-                'Content-Type': 'application/json',
-                'Accept': '*/*'
-              }))));
+      final ttsResponsesList = await Future.wait(
+        ttsPayloadList.map(
+          (eachTaskPayload) => _dio.post(
+            APIConstants.TTS_REQ_URL,
+            data: eachTaskPayload,
+            options: Options(
+              headers: {'Content-Type': 'application/json', 'Accept': '*/*'},
+              validateStatus: (status) => true,
+            ),
+          ),
+        ),
+      );
 
       List<Map<String, dynamic>> ttsOutputResponsesList = [];
 
@@ -133,17 +180,23 @@ class TranslationAppAPIClient {
             'gender': ttsPayloadList[eachResponse.key]['gender'],
             'output': eachResponse.value.data
           });
-        } else {
-          ttsOutputResponsesList.add({
-            'gender': ttsPayloadList[eachResponse.key]['gender'],
-            'output': eachResponse.value.data
-          });
         }
       }).toList();
-
-      return ttsOutputResponsesList;
-    } on Exception {
-      return [];
+      if (ttsOutputResponsesList.isNotEmpty) {
+        return Result.success(ttsOutputResponsesList);
+      } else {
+        return Result.failure(
+            AppException(APIConstants.kErrorMessageGenericError));
+      }
+    } on DioError catch (error) {
+      return Result.failure(
+          AppException(NetworkError(error).getErrorModel().errorMessage));
+    } on Exception catch (error) {
+      if (kDebugMode) {
+        print('Other Exception::: ${error.toString()}');
+      }
+      return Result.failure(
+          AppException(APIConstants.kErrorMessageGenericError));
     }
   }
 }
